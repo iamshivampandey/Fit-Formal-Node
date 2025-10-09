@@ -1,0 +1,9 @@
+SELECT id, email, password, firstName, lastName, phoneNumber, createdAt, modifiedAt, isActive 
+FROM Users 
+{{#if Email}}
+WHERE email = '{{Email}}'
+{{/if}}
+{{#if conditions}}
+WHERE {{#each conditions}}{{@key}} = '{{this}}'{{#unless @last}} AND {{/unless}}{{/each}}
+{{/if}}
+ORDER BY createdAt DESC;

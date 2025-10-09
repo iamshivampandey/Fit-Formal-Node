@@ -1,0 +1,10 @@
+UPDATE Users 
+SET 
+  {{#if email}}email = '{{email}}',{{/if}}
+  {{#if password}}password = '{{password}}',{{/if}}
+  {{#if firstName}}firstName = '{{firstName}}',{{/if}}
+  {{#if lastName}}lastName = '{{lastName}}',{{/if}}
+  {{#if phoneNumber}}phoneNumber = '{{phoneNumber}}',{{/if}}
+  {{#if isActive}}isActive = {{isActive}},{{/if}}
+  modifiedAt = '{{modifiedAt}}'
+WHERE id = {{id}};

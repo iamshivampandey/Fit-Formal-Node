@@ -12,12 +12,38 @@ const router = express.Router();
 router.post('/signup', validationMiddleware.validateUserRegistration, async (req, res) => {
   try {
     console.log('🔄 Signup request received:', req.body);
-    const { email, password, firstName, lastName, phoneNumber } = req.body;
+    const { email, password, firstName, lastName, phoneNumber, roleName } = req.body;
+
+    // Default to 'Customer' if roleName is not provided
+    const roleNameToUse = roleName || 'Customer';
+    console.log('🔄 Role to assign:', roleNameToUse);
+
+    // Get role by name
+    console.log('🔄 Looking up role:', roleNameToUse);
+    let role;
+    try {
+      role = await databaseService.db.GetRoleByName(roleNameToUse);
+      if (!role) {
+        console.log('❌ Invalid role name:', roleNameToUse);
+        return res.status(400).json({
+          success: false,
+          message: `Invalid role name: ${roleNameToUse}. Valid roles are: Admin, Customer, Seller, Tailor, Taylorseller`
+        });
+      }
+      console.log('✅ Role found:', role);
+    } catch (error) {
+      console.error('❌ Error fetching role:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to fetch role information',
+        error: process.env.NODE_ENV === 'development' ? (error.message || error.toString()) : undefined
+      });
+    }
 
     // Check if user already exists in database
     try {
       console.log('🔄 Checking if user already exists in database...');
-      const existingUser = await databaseService.db.SelectUser({ email });
+      const existingUser = await databaseService.db.GetUserByEmail({ Email: email });
       if (existingUser && Array.isArray(existingUser) && existingUser.length > 0) {
         console.log('❌ User already exists:', email);
         return res.status(409).json({
@@ -50,11 +76,20 @@ router.post('/signup', validationMiddleware.validateUserRegistration, async (req
     };
 
     // Save user to database using database service
+    let userId;
     try {
       console.log('🔄 Saving user to database using database service...');
       const result = await databaseService.db.InsertUser(newUser);
       console.log('✅ User saved to database successfully');
       console.log('📊 Database result:', result);
+      
+      // Get the inserted user ID from the result
+      if (result && result.recordset && result.recordset.length > 0) {
+        userId = result.recordset[0].id;
+        console.log('✅ User ID retrieved:', userId);
+      } else {
+        throw new Error('Failed to retrieve user ID after insertion');
+      }
     } catch (error) {
       console.error('❌ Error saving user to database:', error);
       return res.status(500).json({
@@ -64,7 +99,19 @@ router.post('/signup', validationMiddleware.validateUserRegistration, async (req
       });
     }
 
-    // User saved to database only - no in-memory storage
+    // Insert user-role mapping
+    try {
+      console.log('🔄 Assigning role to user...');
+      await databaseService.db.InsertUserRole(userId, role.id);
+      console.log('✅ Role assigned successfully');
+    } catch (error) {
+      console.error('❌ Error assigning role to user:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'User created but failed to assign role',
+        error: process.env.NODE_ENV === 'development' ? (error.message || error.toString()) : undefined
+      });
+    }
 
     // Remove password from response
     const { password: _, ...userResponse } = newUser;
@@ -74,7 +121,12 @@ router.post('/signup', validationMiddleware.validateUserRegistration, async (req
       success: true,
       message: 'User created successfully',
       data: {
-        user: userResponse
+        user: userResponse,
+        role: {
+          id: role.id,
+          name: role.role_name,
+          description: role.description
+        }
       }
     });
 

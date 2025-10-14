@@ -9,7 +9,10 @@ class DatabaseService {
       UpdateUser: this.UpdateUser.bind(this),
       GetUserByEmail: this.GetUserByEmail.bind(this),
       SelectUsers: this.SelectUsers.bind(this),
-      DeleteUser: this.DeleteUser.bind(this)
+      DeleteUser: this.DeleteUser.bind(this),
+      // Role operations
+      GetRoleByName: this.GetRoleByName.bind(this),
+      InsertUserRole: this.InsertUserRole.bind(this)
     };
   }
 
@@ -120,6 +123,56 @@ class DatabaseService {
       
     } catch (error) {
       console.error('❌ DatabaseService.DeleteUser error:', error);
+      throw error;
+    }
+  }
+
+  // Get role by name using HBS template
+  async GetRoleByName(roleName) {
+    try {
+      console.log('🔄 DatabaseService.GetRoleByName called with roleName:', roleName);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getRoleByName');
+      const sql = template({ roleName });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Role retrieved successfully');
+      console.log('📊 Role result:', result);
+      
+      return (result && result.recordset && result.recordset.length > 0) ? result.recordset[0] : null;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetRoleByName error:', error);
+      throw error;
+    }
+  }
+
+  // Insert user role mapping using HBS template
+  async InsertUserRole(userId, roleId) {
+    try {
+      console.log('🔄 DatabaseService.InsertUserRole called with userId:', userId, 'roleId:', roleId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('insertUserRole');
+      const sql = template({
+        userId,
+        roleId,
+        assignedAt: new Date().toISOString()
+      });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ User role mapping inserted successfully');
+      console.log('📊 Insert result:', result);
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.InsertUserRole error:', error);
       throw error;
     }
   }

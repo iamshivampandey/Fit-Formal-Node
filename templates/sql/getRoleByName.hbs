@@ -1,0 +1,9 @@
+SELECT 
+    id,
+    role_name,
+    description,
+    created_at,
+    updated_at
+FROM roles
+WHERE LOWER(role_name) = LOWER('{{roleName}}')
+

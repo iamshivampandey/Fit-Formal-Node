@@ -128,7 +128,21 @@ const validationRules = {
         return value.replace(/[^\d+]/g, '').replace(/^\+/, '+');
       }
       return value;
+    }),
+
+  // Role name validation (optional, defaults to Customer)
+  roleName: () => body('roleName')
+    .optional()
+    .trim()
+    .customSanitizer(value => {
+      // Capitalize first letter to match database format
+      if (value) {
+        return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+      }
+      return value;
     })
+    .isIn(['Admin', 'Customer', 'Seller', 'Tailor', 'Taylorseller'])
+    .withMessage('Role name must be one of: Admin, Customer, Seller, Tailor, Taylorseller')
 };
 
 // Predefined validation sets for common use cases
@@ -139,7 +153,8 @@ const validationSets = {
     validationRules.password(),
     validationRules.firstName(),
     validationRules.lastName(),
-    validationRules.phoneNumber()
+    validationRules.phoneNumber(),
+    validationRules.roleName()
   ],
 
   // User login validation

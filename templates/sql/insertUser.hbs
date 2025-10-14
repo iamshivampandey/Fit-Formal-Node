@@ -1,3 +1,4 @@
 INSERT INTO Users (email, password, firstName, lastName, phoneNumber, createdAt, modifiedAt, isActive)
+OUTPUT INSERTED.id
 VALUES
   ('{{email}}', '{{password}}', '{{firstName}}', '{{lastName}}', '{{phoneNumber}}', '{{createdAt}}', '{{modifiedAt}}', {{#if isActive}}1{{else}}0{{/if}});

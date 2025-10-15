@@ -1,0 +1,9 @@
+SELECT 
+    r.id,
+    r.role_name,
+    r.description,
+    ur.assigned_at
+FROM userroles ur
+INNER JOIN roles r ON ur.role_id = r.id
+WHERE ur.user_id = {{userId}}
+

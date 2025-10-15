@@ -270,13 +270,25 @@ router.post('/login', validationMiddleware.validateUserLogin, async (req, res) =
       });
     }
 
-    // Generate JWT token
+    // Get user roles
+    console.log('🔄 Fetching user roles...');
+    let userRoles = [];
+    try {
+      userRoles = await databaseService.db.GetUserRoles(user.id);
+      console.log('✅ User roles retrieved:', userRoles);
+    } catch (error) {
+      console.error('⚠️ Error fetching user roles:', error);
+      // Continue without roles if fetch fails
+    }
+
+    // Generate JWT token (include roles in token)
     console.log('🔄 Generating JWT token...');
     const tokenPayload = {
       userId: user.id,
       email: user.email,
       firstName: user.firstName,
-      lastName: user.lastName
+      lastName: user.lastName,
+      roles: userRoles.map(r => ({ id: r.id, name: r.role_name }))
     };
 
     const token = jwt.sign(
@@ -300,6 +312,12 @@ router.post('/login', validationMiddleware.validateUserLogin, async (req, res) =
       message: 'Login successful',
       data: {
         user: userResponse,
+        roles: userRoles.map(r => ({
+          id: r.id,
+          name: r.role_name,
+          description: r.description,
+          assignedAt: r.assigned_at
+        })),
         token: token,
         expiresIn: '24h'
       }

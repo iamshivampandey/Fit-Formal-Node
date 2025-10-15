@@ -12,7 +12,8 @@ class DatabaseService {
       DeleteUser: this.DeleteUser.bind(this),
       // Role operations
       GetRoleByName: this.GetRoleByName.bind(this),
-      InsertUserRole: this.InsertUserRole.bind(this)
+      InsertUserRole: this.InsertUserRole.bind(this),
+      GetUserRoles: this.GetUserRoles.bind(this)
     };
   }
 
@@ -173,6 +174,29 @@ class DatabaseService {
       
     } catch (error) {
       console.error('❌ DatabaseService.InsertUserRole error:', error);
+      throw error;
+    }
+  }
+
+  // Get user roles using HBS template
+  async GetUserRoles(userId) {
+    try {
+      console.log('🔄 DatabaseService.GetUserRoles called with userId:', userId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getUserRoles');
+      const sql = template({ userId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ User roles retrieved successfully');
+      console.log('📊 Roles result:', result);
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetUserRoles error:', error);
       throw error;
     }
   }

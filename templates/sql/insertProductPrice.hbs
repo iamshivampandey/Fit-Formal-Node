@@ -1,0 +1,15 @@
+INSERT INTO ProductPrices (
+    product_id, currency_code, price_mrp, price_sale,
+    valid_from, valid_to, is_active, created_at
+)
+VALUES (
+    {{product_id}},
+    {{sqlValue currency_code}},
+    {{price_mrp}},
+    {{#if price_sale}}{{price_sale}}{{else}}NULL{{/if}},
+    '{{valid_from}}',
+    {{#if valid_to}}'{{valid_to}}'{{else}}NULL{{/if}},
+    {{#if is_active}}1{{else}}0{{/if}},
+    '{{created_at}}'
+);
+

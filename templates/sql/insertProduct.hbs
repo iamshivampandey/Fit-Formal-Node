@@ -1,0 +1,40 @@
+INSERT INTO UnstitchedFabricProducts (
+    title, brand_id, category_id, sku, style_code, model_name, product_type,
+    color, brand_color, fabric, fabric_purity, composition, pattern,
+    material, weave, finish, width, weight, unit, country_of_origin,
+    care_instructions, description, tags, meta_keywords, meta_description,
+    seo_slug, is_active, created_at, updated_at
+)
+OUTPUT INSERTED.id
+VALUES (
+    {{sqlValue title}},
+    {{#if brand_id}}{{brand_id}}{{else}}NULL{{/if}},
+    {{#if category_id}}{{category_id}}{{else}}NULL{{/if}},
+    {{sqlValue sku}},
+    {{sqlValue style_code}},
+    {{sqlValue model_name}},
+    {{sqlValue product_type}},
+    {{sqlValue color}},
+    {{sqlValue brand_color}},
+    {{sqlValue fabric}},
+    {{sqlValue fabric_purity}},
+    {{sqlValue composition}},
+    {{sqlValue pattern}},
+    {{sqlValue material}},
+    {{sqlValue weave}},
+    {{sqlValue finish}},
+    {{#if width}}{{width}}{{else}}NULL{{/if}},
+    {{#if weight}}{{weight}}{{else}}NULL{{/if}},
+    {{sqlValue unit}},
+    {{sqlValue country_of_origin}},
+    {{sqlValue care_instructions}},
+    {{sqlValue description}},
+    {{sqlValue tags}},
+    {{sqlValue meta_keywords}},
+    {{sqlValue meta_description}},
+    {{sqlValue seo_slug}},
+    {{#if is_active}}1{{else}}0{{/if}},
+    '{{created_at}}',
+    '{{updated_at}}'
+);
+

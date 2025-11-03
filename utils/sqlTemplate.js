@@ -2,6 +2,27 @@ const Handlebars = require('handlebars');
 const fs = require('fs');
 const path = require('path');
 
+// Register Handlebars helper to escape SQL strings (escape single quotes)
+Handlebars.registerHelper('escapeSQL', function(str) {
+  if (!str) return '';
+  return String(str).replace(/'/g, "''"); // Escape single quotes by doubling them
+});
+
+// Helper to safely format SQL values (handles null, numbers, strings)
+Handlebars.registerHelper('sqlValue', function(value) {
+  if (value === null || value === undefined) {
+    return 'NULL';
+  }
+  if (typeof value === 'number') {
+    return value;
+  }
+  if (typeof value === 'boolean') {
+    return value ? 1 : 0;
+  }
+  // String: escape and wrap in quotes
+  return `'${String(value).replace(/'/g, "''")}'`;
+});
+
 // Load and compile SQL templates
 const loadTemplate = (templateName) => {
   try {

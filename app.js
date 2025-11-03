@@ -13,6 +13,7 @@ const databaseService = require('./services/databaseService');
 
 // Import controllers
 const loginController = require('./controllers/loginController');
+const productController = require('./controllers/productController');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -33,6 +34,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/api/auth', loginController);
+app.use('/api/products', productController);
 
 // Health check endpoint
 app.get('/', (req, res) => {

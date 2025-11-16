@@ -1,0 +1,41 @@
+SELECT 
+    p.*,
+    b.name as brand_name,
+    c.name as category_name,
+    pr.id as price_id,
+    pr.currency_code,
+    pr.price_mrp,
+    pr.price_sale,
+    pr.valid_from as price_valid_from,
+    pr.valid_to as price_valid_to,
+    pr.is_active as price_is_active,
+    comp.country_of_origin,
+    comp.manufacturer_details,
+    comp.packer_details,
+    comp.importer_details,
+    comp.mfg_month_year,
+    comp.customer_care,
+    up.UserId as user_id,
+    up.Created_At as user_added_at,
+    (SELECT TOP 1 url FROM ProductImages WHERE product_id = p.id AND is_primary = 1) as primary_image
+FROM UnstitchedFabricProducts p
+LEFT JOIN brands b ON p.brand_id = b.id
+LEFT JOIN categories c ON p.category_id = c.id
+LEFT JOIN ProductPrices pr ON p.id = pr.product_id AND pr.is_active = 1
+LEFT JOIN Product_Compliance comp ON p.id = comp.product_id
+LEFT JOIN UserUnstichedProducts up ON p.id = up.ProductId
+WHERE up.UserId = {{user_id}}
+{{#if productId}}
+  AND p.id = {{productId}}
+{{/if}}
+{{#if is_active_defined}}
+  AND p.is_active = {{is_active_value}}
+{{else}}
+  AND p.is_active = 1
+{{/if}}
+ORDER BY p.created_at DESC
+{{#if limit}}
+OFFSET {{offset}} ROWS
+FETCH NEXT {{limit}} ROWS ONLY
+{{/if}};
+

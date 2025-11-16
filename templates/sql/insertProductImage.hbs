@@ -1,0 +1,10 @@
+INSERT INTO ProductImages (
+    product_id, url, is_primary
+)
+OUTPUT INSERTED.id
+VALUES (
+    {{product_id}},
+    {{{sqlValue url}}},
+    {{#if is_primary}}1{{else}}0{{/if}}
+);
+

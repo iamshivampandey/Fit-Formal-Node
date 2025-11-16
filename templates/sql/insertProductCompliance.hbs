@@ -1,0 +1,20 @@
+INSERT INTO Product_Compliance (
+    product_id,
+    country_of_origin,
+    manufacturer_details,
+    packer_details,
+    importer_details,
+    mfg_month_year,
+    customer_care
+)
+VALUES (
+    {{product_id}},
+    {{{sqlValue country_of_origin}}},
+    {{{sqlValue manufacturer_details}}},
+    {{{sqlValue packer_details}}},
+    {{{sqlValue importer_details}}},
+    {{{sqlValue mfg_month_year}}},
+    {{{sqlValue customer_care}}}
+);
+
+

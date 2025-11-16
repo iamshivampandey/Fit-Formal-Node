@@ -3,9 +3,9 @@ const sql = require('mssql');
 // Database configuration
 const dbConfig = {
   server: 'localhost',
-  database: 'PaystreamCutoverTest',
+  database: 'FitFormal',
   user: 'sa',
-  password: 'test',
+  password: 'Test',
   options: {
     encrypt: false,
     trustServerCertificate: true,

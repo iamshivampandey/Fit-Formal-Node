@@ -4,7 +4,7 @@ INSERT INTO ProductPrices (
 )
 VALUES (
     {{product_id}},
-    {{sqlValue currency_code}},
+    {{{sqlValue currency_code}}},
     {{price_mrp}},
     {{#if price_sale}}{{price_sale}}{{else}}NULL{{/if}},
     '{{valid_from}}',

@@ -17,6 +17,12 @@ class DatabaseService {
       // Product operations
       InsertProduct: this.InsertProduct.bind(this),
       InsertProductPrice: this.InsertProductPrice.bind(this),
+      InsertProductImage: this.InsertProductImage.bind(this),
+      InsertProductCompliance: this.InsertProductCompliance.bind(this),
+      InsertUserProduct: this.InsertUserProduct.bind(this),
+      GetProductById: this.GetProductById.bind(this),
+      GetProductImages: this.GetProductImages.bind(this),
+      GetAllProducts: this.GetAllProducts.bind(this),
       GetBrandByName: this.GetBrandByName.bind(this),
       GetBrandById: this.GetBrandById.bind(this),
       GetCategoryByName: this.GetCategoryByName.bind(this),
@@ -343,6 +349,145 @@ class DatabaseService {
       
     } catch (error) {
       console.error('❌ DatabaseService.GetCategoryById error:', error);
+      throw error;
+    }
+  }
+
+  // Insert product image using HBS template
+  async InsertProductImage(parameters) {
+    try {
+      console.log('🔄 DatabaseService.InsertProductImage called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('insertProductImage');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Product image inserted successfully');
+      
+      // Get the inserted image ID from the result
+      if (result && result.recordset && result.recordset.length > 0) {
+        const imageId = result.recordset[0].id;
+        console.log('✅ Product image ID retrieved:', imageId);
+        return { success: true, imageId };
+      } else {
+        throw new Error('Failed to retrieve image ID after insertion');
+      }
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.InsertProductImage error:', error);
+      throw error;
+    }
+  }
+
+  // Insert product compliance using HBS template
+  async InsertProductCompliance(parameters) {
+    try {
+      console.log('🔄 DatabaseService.InsertProductCompliance called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('insertProductCompliance');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Product compliance inserted successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.InsertProductCompliance error:', error);
+      throw error;
+    }
+  }
+
+  // Get product by ID with all associated data
+  async GetProductById(id, userId = null) {
+    try {
+      console.log('🔄 DatabaseService.GetProductById called with id:', id, 'user_id:', userId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getProductById');
+      const sql = template({ id, user_id: userId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Product retrieved successfully');
+      
+      return (result && result.recordset && result.recordset.length > 0) ? result.recordset[0] : null;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetProductById error:', error);
+      throw error;
+    }
+  }
+
+  // Get product images
+  async GetProductImages(productId) {
+    try {
+      console.log('🔄 DatabaseService.GetProductImages called with productId:', productId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getProductImages');
+      const sql = template({ product_id: productId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Product images retrieved successfully');
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetProductImages error:', error);
+      throw error;
+    }
+  }
+
+  // Get all products with pagination
+  async GetAllProducts(parameters = {}) {
+    try {
+      console.log('🔄 DatabaseService.GetAllProducts called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getAllProducts');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Products retrieved successfully');
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetAllProducts error:', error);
+      throw error;
+    }
+  }
+
+  // Insert user-product relationship
+  async InsertUserProduct(parameters) {
+    try {
+      console.log('🔄 DatabaseService.InsertUserProduct called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('insertUserProduct');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ User-product relationship inserted successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.InsertUserProduct error:', error);
       throw error;
     }
   }

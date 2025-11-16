@@ -1,0 +1,9 @@
+SELECT 
+    id,
+    product_id,
+    url,
+    is_primary
+FROM ProductImages
+WHERE product_id = {{product_id}}
+ORDER BY is_primary DESC, id ASC;
+

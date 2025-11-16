@@ -1,0 +1,11 @@
+INSERT INTO UserUnstichedProducts (
+    UserId,
+    ProductId,
+    Created_At
+)
+VALUES (
+    {{user_id}},
+    {{product_id}},
+    GETDATE()
+);
+

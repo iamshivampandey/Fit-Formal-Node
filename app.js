@@ -26,6 +26,9 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Serve static files (uploaded images)
+app.use('/uploads', express.static('uploads'));
+
 // Request logging middleware
 app.use((req, res, next) => {
   console.log(`📥 ${req.method} ${req.url} - ${new Date().toISOString()}`);

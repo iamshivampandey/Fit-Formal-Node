@@ -16,9 +16,13 @@ class DatabaseService {
       GetUserRoles: this.GetUserRoles.bind(this),
       // Product operations
       InsertProduct: this.InsertProduct.bind(this),
+      UpdateProduct: this.UpdateProduct.bind(this),
       InsertProductPrice: this.InsertProductPrice.bind(this),
+      UpdateProductPrice: this.UpdateProductPrice.bind(this),
       InsertProductImage: this.InsertProductImage.bind(this),
+      DeleteProductImages: this.DeleteProductImages.bind(this),
       InsertProductCompliance: this.InsertProductCompliance.bind(this),
+      UpdateProductCompliance: this.UpdateProductCompliance.bind(this),
       InsertUserProduct: this.InsertUserProduct.bind(this),
       GetProductById: this.GetProductById.bind(this),
       GetProductImages: this.GetProductImages.bind(this),
@@ -488,6 +492,103 @@ class DatabaseService {
       
     } catch (error) {
       console.error('❌ DatabaseService.InsertUserProduct error:', error);
+      throw error;
+    }
+  }
+
+  // Update product using HBS template
+  async UpdateProduct(productId, parameters) {
+    try {
+      console.log('🔄 DatabaseService.UpdateProduct called with ID:', productId, 'parameters:', parameters);
+      
+      // Add product_id to parameters
+      const updateData = { ...parameters, product_id: productId };
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('updateProduct');
+      const sql = template(updateData);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Product updated successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.UpdateProduct error:', error);
+      throw error;
+    }
+  }
+
+  // Update product price using HBS template
+  async UpdateProductPrice(productId, parameters) {
+    try {
+      console.log('🔄 DatabaseService.UpdateProductPrice called with productId:', productId, 'parameters:', parameters);
+      
+      // Add product_id to parameters
+      const updateData = { ...parameters, product_id: productId };
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('updateProductPrice');
+      const sql = template(updateData);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Product price updated successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.UpdateProductPrice error:', error);
+      throw error;
+    }
+  }
+
+  // Update product compliance using HBS template
+  async UpdateProductCompliance(productId, parameters) {
+    try {
+      console.log('🔄 DatabaseService.UpdateProductCompliance called with productId:', productId, 'parameters:', parameters);
+      
+      // Add product_id to parameters
+      const updateData = { ...parameters, product_id: productId };
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('updateProductCompliance');
+      const sql = template(updateData);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Product compliance updated successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.UpdateProductCompliance error:', error);
+      throw error;
+    }
+  }
+
+  // Delete product images using HBS template
+  async DeleteProductImages(productId) {
+    try {
+      console.log('🔄 DatabaseService.DeleteProductImages called with productId:', productId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('deleteProductImages');
+      const sql = template({ product_id: productId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Product images deleted successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.DeleteProductImages error:', error);
       throw error;
     }
   }

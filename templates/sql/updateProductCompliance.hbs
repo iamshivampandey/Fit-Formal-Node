@@ -1,0 +1,10 @@
+UPDATE Product_Compliance
+SET
+    country_of_origin = {{{sqlValue country_of_origin}}},
+    manufacturer_details = {{{sqlValue manufacturer_details}}},
+    packer_details = {{{sqlValue packer_details}}},
+    importer_details = {{{sqlValue importer_details}}},
+    mfg_month_year = {{{sqlValue mfg_month_year}}},
+    customer_care = {{{sqlValue customer_care}}}
+WHERE product_id = {{product_id}};
+

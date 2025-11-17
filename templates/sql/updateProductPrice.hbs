@@ -1,0 +1,10 @@
+UPDATE ProductPrices
+SET
+    currency_code = {{{sqlValue currency_code}}},
+    price_mrp = {{price_mrp}},
+    price_sale = {{#if price_sale}}{{price_sale}}{{else}}NULL{{/if}},
+    valid_from = '{{valid_from}}',
+    valid_to = {{#if valid_to}}'{{valid_to}}'{{else}}NULL{{/if}},
+    is_active = {{#if is_active}}1{{else}}0{{/if}}
+WHERE product_id = {{product_id}};
+

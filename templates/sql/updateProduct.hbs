@@ -1,0 +1,27 @@
+UPDATE UnstitchedFabricProducts
+SET
+    title = {{{sqlValue title}}},
+    brand_id = {{#if brand_id}}{{brand_id}}{{else}}NULL{{/if}},
+    category_id = {{#if category_id}}{{category_id}}{{else}}NULL{{/if}},
+    sku = {{{sqlValue sku}}},
+    style_code = {{{sqlValue style_code}}},
+    model_name = {{{sqlValue model_name}}},
+    product_type = {{{sqlValue product_type}}},
+    color = {{{sqlValue color}}},
+    brand_color = {{{sqlValue brand_color}}},
+    fabric = {{{sqlValue fabric}}},
+    fabric_purity = {{{sqlValue fabric_purity}}},
+    composition = {{{sqlValue composition}}},
+    pattern = {{{sqlValue pattern}}},
+    stitching_type = {{{sqlValue stitching_type}}},
+    ideal_for = {{{sqlValue ideal_for}}},
+    unit = {{#if unit}}{{{sqlValue unit}}}{{else}}'meter'{{/if}},
+    top_length_value = {{#if top_length_value}}{{top_length_value}}{{else}}NULL{{/if}},
+    top_length_unit = {{#if top_length_unit}}{{{sqlValue top_length_unit}}}{{else}}'m'{{/if}},
+    sales_package = {{{sqlValue sales_package}}},
+    short_description = {{{sqlValue short_description}}},
+    long_description = {{{sqlValue long_description}}},
+    is_active = {{#if is_active}}1{{else}}0{{/if}},
+    updated_at = '{{updated_at}}'
+WHERE id = {{product_id}};
+

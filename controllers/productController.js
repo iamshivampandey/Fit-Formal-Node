@@ -686,5 +686,347 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+/**
+ * Update Product API
+ * PUT /api/products/:id
+ * 
+ * Updates an existing product with all its related data (pricing, images, compliance).
+ * Accepts product data (multipart/form-data) similar to create product.
+ * Supports brand and category lookup by name or ID.
+ * Images should be uploaded with field name 'images' (multiple files allowed).
+ * If images are provided, existing images will be deleted and replaced with new ones.
+ */
+router.put('/:id', handleUpload, async (req, res) => {
+  try {
+    const productId = parseInt(req.params.id);
+    
+    console.log('🔄 Update product request received for ID:', productId);
+    console.log('📋 Body fields:', req.body);
+    console.log('📷 Uploaded files:', req.files ? req.files.length : 0);
+    
+    if (isNaN(productId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid product ID'
+      });
+    }
+    
+    // Check if product exists
+    const existingProduct = await databaseService.db.GetProductById(productId);
+    if (!existingProduct) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+    
+    // Parse JSON fields from form data (if sent as form-data)
+    let bodyData = req.body;
+    
+    // If body is a string (from multipart/form-data), try to parse it
+    if (typeof bodyData === 'string') {
+      try {
+        bodyData = JSON.parse(bodyData);
+      } catch (e) {
+        // If not JSON, use as is
+      }
+    }
+    
+    // Helper to parse form-data fields (can be arrays or strings)
+    const parseField = (field) => {
+      if (Array.isArray(field)) return field[0];
+      if (typeof field === 'string' && field.trim() !== '') {
+        // Try to parse as JSON if it looks like JSON
+        if ((field.startsWith('{') || field.startsWith('['))) {
+          try {
+            return JSON.parse(field);
+          } catch (e) {
+            return field;
+          }
+        }
+        return field;
+      }
+      return field;
+    };
+    
+    // Manual validation for required fields
+    const parsedTitle = parseField(bodyData.title);
+    if (!parsedTitle || typeof parsedTitle !== 'string' || parsedTitle.trim().length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: 'Product title is required and must be at least 3 characters'
+      });
+    }
+    
+    const parsedPriceMrp = parseField(bodyData.price_mrp);
+    if (!parsedPriceMrp || isNaN(parseFloat(parsedPriceMrp)) || parseFloat(parsedPriceMrp) < 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'MRP price is required and must be a valid positive number'
+      });
+    }
+    
+    const {
+      title,
+      brand,
+      category,
+      sku,
+      style_code,
+      model_name,
+      product_type,
+      color,
+      brand_color,
+      fabric,
+      fabric_purity,
+      composition,
+      pattern,
+      stitching_type,
+      ideal_for,
+      unit,
+      top_length_value,
+      top_length_unit,
+      sales_package,
+      short_description,
+      long_description,
+      is_active,
+      // Price fields
+      price_mrp,
+      price_sale,
+      currency_code,
+      valid_from,
+      valid_to
+    } = bodyData;
+
+    // Extract compliance fields (optional)
+    const {
+      country_of_origin,
+      manufacturer_details,
+      packer_details,
+      importer_details,
+      mfg_month_year,
+      customer_care
+    } = bodyData;
+
+    // Resolve brand ID (supports name or ID)
+    let brandId = null;
+    const parsedBrand = parseField(brand);
+    if (parsedBrand) {
+      try {
+        brandId = await getBrandId(parsedBrand);
+        console.log('✅ Brand resolved:', brandId);
+      } catch (error) {
+        console.error('❌ Brand resolution error:', error.message);
+        return res.status(400).json({
+          success: false,
+          message: error.message
+        });
+      }
+    }
+
+    // Resolve category ID (supports name or ID)
+    let categoryId = null;
+    const parsedCategory = parseField(category);
+    if (parsedCategory) {
+      try {
+        categoryId = await getCategoryId(parsedCategory);
+        console.log('✅ Category resolved:', categoryId);
+      } catch (error) {
+        console.error('❌ Category resolution error:', error.message);
+        return res.status(400).json({
+          success: false,
+          message: error.message
+        });
+      }
+    }
+
+    // Prepare product data
+    const currentTime = new Date().toISOString();
+    const productData = {
+      title: parseField(title),
+      brand_id: brandId,
+      category_id: categoryId,
+      sku: parseField(sku) || null,
+      style_code: parseField(style_code) || null,
+      model_name: parseField(model_name) || null,
+      product_type: parseField(product_type) || null,
+      color: parseField(color) || null,
+      brand_color: parseField(brand_color) || null,
+      fabric: parseField(fabric) || null,
+      fabric_purity: parseField(fabric_purity) || null,
+      composition: parseField(composition) || null,
+      pattern: parseField(pattern) || null,
+      stitching_type: parseField(stitching_type) || null,
+      ideal_for: parseField(ideal_for) || null,
+      unit: parseField(unit) || null,
+      top_length_value: parseField(top_length_value) ? parseFloat(parseField(top_length_value)) : null,
+      top_length_unit: parseField(top_length_unit) || null,
+      sales_package: parseField(sales_package) || null,
+      short_description: parseField(short_description) || null,
+      long_description: parseField(long_description) || null,
+      is_active: is_active !== undefined ? (typeof is_active === 'string' ? is_active === 'true' : is_active) : true,
+      updated_at: currentTime
+    };
+
+    // Update product in database
+    try {
+      console.log('🔄 Updating product in database...');
+      await databaseService.db.UpdateProduct(productId, productData);
+      console.log('✅ Product updated successfully');
+    } catch (error) {
+      console.error('❌ Error updating product:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to update product',
+        error: process.env.NODE_ENV === 'development' ? (error.message || error.toString()) : undefined
+      });
+    }
+
+    // Update product price
+    try {
+      console.log('🔄 Updating product price...');
+      const parsedPriceSale = parseField(bodyData.price_sale);
+      const parsedCurrencyCode = parseField(bodyData.currency_code) || 'INR';
+      const parsedValidFrom = parseField(bodyData.valid_from) || currentTime;
+      const parsedValidTo = parseField(bodyData.valid_to) || null;
+      
+      const priceData = {
+        currency_code: parsedCurrencyCode,
+        price_mrp: parseFloat(parsedPriceMrp),
+        price_sale: parsedPriceSale ? parseFloat(parsedPriceSale) : null,
+        valid_from: parsedValidFrom,
+        valid_to: parsedValidTo,
+        is_active: true
+      };
+
+      await databaseService.db.UpdateProductPrice(productId, priceData);
+      console.log('✅ Product price updated successfully');
+    } catch (error) {
+      console.error('⚠️ Warning: Product updated but price update failed:', error);
+      // Continue even if price update fails (product is already updated)
+    }
+
+    // Update product compliance if any compliance field is provided
+    try {
+      const hasCompliance =
+        parseField(country_of_origin) ||
+        parseField(manufacturer_details) ||
+        parseField(packer_details) ||
+        parseField(importer_details) ||
+        parseField(mfg_month_year) ||
+        parseField(customer_care);
+
+      if (hasCompliance) {
+        console.log('🔄 Updating product compliance...');
+        const complianceData = {
+          country_of_origin: parseField(country_of_origin) || null,
+          manufacturer_details: parseField(manufacturer_details) || null,
+          packer_details: parseField(packer_details) || null,
+          importer_details: parseField(importer_details) || null,
+          mfg_month_year: parseField(mfg_month_year) || null,
+          customer_care: parseField(customer_care) || null
+        };
+        await databaseService.db.UpdateProductCompliance(productId, complianceData);
+        console.log('✅ Product compliance updated successfully');
+      }
+    } catch (error) {
+      console.error('⚠️ Warning: Product updated but compliance update failed:', error);
+      // Continue even if compliance update fails
+    }
+
+    // Handle image uploads - if new images are provided, delete old ones and add new ones
+    const uploadedImages = [];
+    if (req.files && req.files.length > 0) {
+      console.log(`🔄 Processing ${req.files.length} uploaded image(s)...`);
+      
+      // Delete existing images
+      try {
+        console.log('🔄 Deleting existing product images...');
+        await databaseService.db.DeleteProductImages(productId);
+        console.log('✅ Existing images deleted');
+      } catch (error) {
+        console.error('⚠️ Warning: Failed to delete existing images:', error);
+      }
+      
+      // Insert new images
+      for (let i = 0; i < req.files.length; i++) {
+        const file = req.files[i];
+        try {
+          // Generate URL for the uploaded image
+          const imageUrl = `/uploads/products/${file.filename}`;
+          
+          // First image is marked as primary
+          const isPrimary = i === 0;
+          
+          const imageData = {
+            product_id: productId,
+            url: imageUrl,
+            is_primary: isPrimary
+          };
+          
+          await databaseService.db.InsertProductImage(imageData);
+          console.log(`✅ Image ${i + 1} saved successfully: ${file.filename}`);
+          
+          uploadedImages.push({
+            filename: file.filename,
+            url: imageUrl,
+            is_primary: isPrimary,
+            size: file.size,
+            mimetype: file.mimetype
+          });
+        } catch (error) {
+          console.error(`⚠️ Warning: Failed to save image ${i + 1} (${file.filename}):`, error);
+          // Continue processing other images even if one fails
+        }
+      }
+      
+      if (uploadedImages.length > 0) {
+        console.log(`✅ Successfully saved ${uploadedImages.length} image(s)`);
+      }
+    }
+
+    // Prepare response
+    const response = {
+      success: true,
+      message: 'Product updated successfully',
+      data: {
+        product: {
+          id: productId,
+          title: productData.title,
+          brand_id: brandId,
+          category_id: categoryId,
+          sku: productData.sku,
+          style_code: productData.style_code,
+          model_name: productData.model_name,
+          product_type: productData.product_type,
+          color: productData.color,
+          brand_color: productData.brand_color,
+          fabric: productData.fabric,
+          is_active: productData.is_active,
+          updated_at: currentTime
+        },
+        price: price_mrp ? {
+          currency_code: parseField(currency_code) || 'INR',
+          price_mrp: parseFloat(parseField(price_mrp)),
+          price_sale: parseField(price_sale) ? parseFloat(parseField(price_sale)) : null,
+          valid_from: parseField(valid_from) || currentTime,
+          valid_to: parseField(valid_to) || null
+        } : null,
+        images: uploadedImages.length > 0 ? uploadedImages : null
+      }
+    };
+
+    console.log('🎉 Product update completed successfully');
+    res.status(200).json(response);
+
+  } catch (error) {
+    console.error('❌ Update product error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error during product update',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
 module.exports = router;
 

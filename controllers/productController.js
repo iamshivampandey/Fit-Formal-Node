@@ -315,6 +315,7 @@ router.post('/', handleUpload, async (req, res) => {
       
       const priceData = {
         product_id: productId,
+        product_type: 'UnstitchedFabricProduct',
         currency_code: parsedCurrencyCode,
         price_mrp: parseFloat(parsedPriceMrp),
         price_sale: parsedPriceSale ? parseFloat(parsedPriceSale) : null,
@@ -573,6 +574,108 @@ router.get('/', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve products',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+/**
+ * Get All Product Types API
+ * GET /api/products/getAllProductTypes
+ * 
+ * Returns all active product types from ProductTypes table
+ */
+router.get('/getAllProductTypes', async (req, res) => {
+  try {
+    console.log('🔄 Get all product types request received');
+    
+    // Get all product types
+    const productTypes = await databaseService.db.GetAllProductTypes();
+    
+    console.log(`✅ Retrieved ${productTypes.length} product types`);
+    
+    res.status(200).json({
+      success: true,
+      message: 'Product types retrieved successfully',
+      data: {
+        product_types: productTypes,
+        count: productTypes.length
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ Get product types error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve product types',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+/**
+ * Get All Categories API
+ * GET /api/products/getAllCategories
+ * 
+ * Returns all active categories from categories table
+ */
+router.get('/getAllCategories', async (req, res) => {
+  try {
+    console.log('🔄 Get all categories request received');
+    
+    // Get all categories
+    const categories = await databaseService.db.GetAllCategories();
+    
+    console.log(`✅ Retrieved ${categories.length} categories`);
+    
+    res.status(200).json({
+      success: true,
+      message: 'Categories retrieved successfully',
+      data: {
+        categories: categories,
+        count: categories.length
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ Get categories error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve categories',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+/**
+ * Get All Brands API
+ * GET /api/products/getAllBrands
+ * 
+ * Returns all active brands from brands table
+ */
+router.get('/getAllBrands', async (req, res) => {
+  try {
+    console.log('🔄 Get all brands request received');
+    
+    // Get all brands
+    const brands = await databaseService.db.GetAllBrands();
+    
+    console.log(`✅ Retrieved ${brands.length} brands`);
+    
+    res.status(200).json({
+      success: true,
+      message: 'Brands retrieved successfully',
+      data: {
+        brands: brands,
+        count: brands.length
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ Get brands error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve brands',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
@@ -890,6 +993,7 @@ router.put('/:id', handleUpload, async (req, res) => {
       const parsedValidTo = parseField(bodyData.valid_to) || null;
       
       const priceData = {
+        product_type: 'UnstitchedFabricProduct',
         currency_code: parsedCurrencyCode,
         price_mrp: parseFloat(parsedPriceMrp),
         price_sale: parsedPriceSale ? parseFloat(parsedPriceSale) : null,
@@ -1023,6 +1127,109 @@ router.put('/:id', handleUpload, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Internal server error during product update',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+/**
+ * Delete Product API
+ * DELETE /api/products/:id
+ * 
+ * Deletes a product and all its related data (price, images, compliance).
+ * Product ID should be provided in the URL path.
+ */
+router.delete('/:id', async (req, res) => {
+  try {
+    const productId = parseInt(req.params.id);
+    
+    console.log('🔄 Delete product request received for ID:', productId);
+    
+    if (isNaN(productId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid product ID'
+      });
+    }
+    
+    // Check if product exists
+    const existingProduct = await databaseService.db.GetProductById(productId);
+    if (!existingProduct) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+    
+    // Delete product images first
+    try {
+      console.log('🔄 Deleting product images...');
+      await databaseService.db.DeleteProductImages(productId);
+      console.log('✅ Product images deleted');
+    } catch (error) {
+      console.error('⚠️ Warning: Failed to delete product images:', error);
+      // Continue even if image deletion fails
+    }
+    
+    // Delete product compliance
+    try {
+      console.log('🔄 Deleting product compliance...');
+      await databaseService.db.DeleteProductCompliance(productId);
+      console.log('✅ Product compliance deleted');
+    } catch (error) {
+      console.error('⚠️ Warning: Failed to delete product compliance:', error);
+      // Continue even if compliance deletion fails
+    }
+    
+    // Delete product price
+    try {
+      console.log('🔄 Deleting product price...');
+      await databaseService.db.DeleteProductPrice(productId);
+      console.log('✅ Product price deleted');
+    } catch (error) {
+      console.error('⚠️ Warning: Failed to delete product price:', error);
+      // Continue even if price deletion fails
+    }
+    
+    // Delete user-product relationship
+    try {
+      console.log('🔄 Deleting user-product relationship...');
+      await databaseService.db.DeleteUserProduct(productId);
+      console.log('✅ User-product relationship deleted');
+    } catch (error) {
+      console.error('⚠️ Warning: Failed to delete user-product relationship:', error);
+      // Continue even if relationship deletion fails
+    }
+    
+    // Finally, delete the product itself
+    try {
+      console.log('🔄 Deleting product...');
+      await databaseService.db.DeleteProduct(productId);
+      console.log('✅ Product deleted successfully');
+    } catch (error) {
+      console.error('❌ Error deleting product:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to delete product',
+        error: process.env.NODE_ENV === 'development' ? (error.message || error.toString()) : undefined
+      });
+    }
+    
+    // Success response
+    console.log('🎉 Product deletion completed successfully');
+    res.status(200).json({
+      success: true,
+      message: 'Product deleted successfully',
+      data: {
+        deleted_product_id: productId
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ Delete product error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error during product deletion',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }

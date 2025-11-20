@@ -17,20 +17,27 @@ class DatabaseService {
       // Product operations
       InsertProduct: this.InsertProduct.bind(this),
       UpdateProduct: this.UpdateProduct.bind(this),
+      DeleteProduct: this.DeleteProduct.bind(this),
       InsertProductPrice: this.InsertProductPrice.bind(this),
       UpdateProductPrice: this.UpdateProductPrice.bind(this),
+      DeleteProductPrice: this.DeleteProductPrice.bind(this),
       InsertProductImage: this.InsertProductImage.bind(this),
       DeleteProductImages: this.DeleteProductImages.bind(this),
       InsertProductCompliance: this.InsertProductCompliance.bind(this),
       UpdateProductCompliance: this.UpdateProductCompliance.bind(this),
+      DeleteProductCompliance: this.DeleteProductCompliance.bind(this),
       InsertUserProduct: this.InsertUserProduct.bind(this),
+      DeleteUserProduct: this.DeleteUserProduct.bind(this),
       GetProductById: this.GetProductById.bind(this),
       GetProductImages: this.GetProductImages.bind(this),
       GetAllProducts: this.GetAllProducts.bind(this),
       GetBrandByName: this.GetBrandByName.bind(this),
       GetBrandById: this.GetBrandById.bind(this),
+      GetAllBrands: this.GetAllBrands.bind(this),
       GetCategoryByName: this.GetCategoryByName.bind(this),
-      GetCategoryById: this.GetCategoryById.bind(this)
+      GetCategoryById: this.GetCategoryById.bind(this),
+      GetAllCategories: this.GetAllCategories.bind(this),
+      GetAllProductTypes: this.GetAllProductTypes.bind(this)
     };
   }
 
@@ -589,6 +596,160 @@ class DatabaseService {
       
     } catch (error) {
       console.error('❌ DatabaseService.DeleteProductImages error:', error);
+      throw error;
+    }
+  }
+
+  // Delete product using HBS template
+  async DeleteProduct(productId) {
+    try {
+      console.log('🔄 DatabaseService.DeleteProduct called with productId:', productId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('deleteProduct');
+      const sql = template({ product_id: productId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Product deleted successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.DeleteProduct error:', error);
+      throw error;
+    }
+  }
+
+  // Delete product price using HBS template
+  async DeleteProductPrice(productId) {
+    try {
+      console.log('🔄 DatabaseService.DeleteProductPrice called with productId:', productId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('deleteProductPrice');
+      const sql = template({ product_id: productId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Product price deleted successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.DeleteProductPrice error:', error);
+      throw error;
+    }
+  }
+
+  // Delete product compliance using HBS template
+  async DeleteProductCompliance(productId) {
+    try {
+      console.log('🔄 DatabaseService.DeleteProductCompliance called with productId:', productId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('deleteProductCompliance');
+      const sql = template({ product_id: productId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Product compliance deleted successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.DeleteProductCompliance error:', error);
+      throw error;
+    }
+  }
+
+  // Delete user-product relationship using HBS template
+  async DeleteUserProduct(productId) {
+    try {
+      console.log('🔄 DatabaseService.DeleteUserProduct called with productId:', productId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('deleteUserProduct');
+      const sql = template({ product_id: productId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ User-product relationship deleted successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.DeleteUserProduct error:', error);
+      throw error;
+    }
+  }
+
+  // Get all product types using HBS template
+  async GetAllProductTypes() {
+    try {
+      console.log('🔄 DatabaseService.GetAllProductTypes called');
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getAllProductTypes');
+      const sql = template({});
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Product types retrieved successfully');
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetAllProductTypes error:', error);
+      throw error;
+    }
+  }
+
+  // Get all categories using HBS template
+  async GetAllCategories() {
+    try {
+      console.log('🔄 DatabaseService.GetAllCategories called');
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getAllCategories');
+      const sql = template({});
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Categories retrieved successfully');
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetAllCategories error:', error);
+      throw error;
+    }
+  }
+
+  // Get all brands using HBS template
+  async GetAllBrands() {
+    try {
+      console.log('🔄 DatabaseService.GetAllBrands called');
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getAllBrands');
+      const sql = template({});
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Brands retrieved successfully');
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetAllBrands error:', error);
       throw error;
     }
   }

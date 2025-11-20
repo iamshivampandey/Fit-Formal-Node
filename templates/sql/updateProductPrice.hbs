@@ -1,5 +1,6 @@
 UPDATE ProductPrices
 SET
+    product_type = {{{sqlValue product_type}}},
     currency_code = {{{sqlValue currency_code}}},
     price_mrp = {{price_mrp}},
     price_sale = {{#if price_sale}}{{price_sale}}{{else}}NULL{{/if}},

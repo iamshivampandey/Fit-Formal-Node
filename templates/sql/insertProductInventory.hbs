@@ -1,0 +1,8 @@
+INSERT INTO Product_Inventory (
+    product_id, stock_qty
+)
+VALUES (
+    {{product_id}},
+    {{#if stock_qty}}{{stock_qty}}{{else}}0{{/if}}
+);
+

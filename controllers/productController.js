@@ -194,7 +194,9 @@ router.post('/', handleUpload, async (req, res) => {
       price_sale,
       currency_code,
       valid_from,
-      valid_to
+      valid_to,
+      // Inventory fields
+      stock_qty,
     } = bodyData;
 
     // Extract compliance fields (optional)
@@ -359,6 +361,24 @@ router.post('/', handleUpload, async (req, res) => {
     } catch (error) {
       console.error('⚠️ Warning: Product created but compliance insertion failed:', error);
       // Continue even if compliance insertion fails
+    }
+
+    // Insert product inventory
+    try {
+      console.log('🔄 Inserting product inventory...');
+      const parsedStockQty = parseField(stock_qty);
+      
+      const inventoryData = {
+        product_id: productId,
+        stock_qty: parsedStockQty ? parseInt(parsedStockQty) : 0,
+        is_in_stock: parsedStockQty ? 1 : 0
+      };
+      
+      await databaseService.db.InsertProductInventory(inventoryData);
+      console.log('✅ Product inventory saved successfully');
+    } catch (error) {
+      console.error('⚠️ Warning: Product created but inventory insertion failed:', error);
+      // Continue even if inventory insertion fails
     }
 
     // Handle image uploads
@@ -553,6 +573,10 @@ router.get('/', async (req, res) => {
         mfg_month_year: product.mfg_month_year,
         customer_care: product.customer_care
       } : null,
+      inventory: {
+        stock_qty: product.stock_qty || 0,
+        is_in_stock: product.is_in_stock || 0
+      },
       primary_image: product.primary_image
     }));
     
@@ -772,6 +796,10 @@ router.get('/:id', async (req, res) => {
           mfg_month_year: product.mfg_month_year,
           customer_care: product.customer_care
         } : null,
+        inventory: {
+          stock_qty: product.stock_qty || 0,
+          is_in_stock: product.is_in_stock || 0
+        },
         images: images.length > 0 ? images : null
       }
     };
@@ -897,7 +925,10 @@ router.put('/:id', handleUpload, async (req, res) => {
       price_sale,
       currency_code,
       valid_from,
-      valid_to
+      valid_to,
+      // Inventory fields
+      stock_qty,
+      is_in_stock
     } = bodyData;
 
     // Extract compliance fields (optional)
@@ -1035,6 +1066,28 @@ router.put('/:id', handleUpload, async (req, res) => {
     } catch (error) {
       console.error('⚠️ Warning: Product updated but compliance update failed:', error);
       // Continue even if compliance update fails
+    }
+
+    // Update product inventory if inventory fields are provided
+    try {
+      const hasInventory = stock_qty !== undefined || is_in_stock !== undefined;
+      
+      if (hasInventory) {
+        console.log('🔄 Updating product inventory...');
+        const parsedStockQty = parseField(stock_qty);
+        const parsedIsInStock = parseField(is_in_stock);
+        
+        const inventoryData = {
+          stock_qty: parsedStockQty !== undefined && parsedStockQty !== null ? parseInt(parsedStockQty) : 0,
+          is_in_stock: parsedStockQty ? 1 : 0
+        };
+        
+        await databaseService.db.UpdateProductInventory(productId, inventoryData);
+        console.log('✅ Product inventory updated successfully');
+      }
+    } catch (error) {
+      console.error('⚠️ Warning: Product updated but inventory update failed:', error);
+      // Continue even if inventory update fails
     }
 
     // Handle image uploads - if new images are provided, delete old ones and add new ones

@@ -15,6 +15,8 @@ SELECT
     comp.importer_details,
     comp.mfg_month_year,
     comp.customer_care,
+    inv.stock_qty,
+    inv.is_in_stock,
     up.UserId as user_id,
     up.Created_At as user_added_at,
     (SELECT TOP 1 url FROM ProductImages WHERE product_id = p.id AND is_primary = 1) as primary_image
@@ -23,6 +25,7 @@ LEFT JOIN brands b ON p.brand_id = b.id
 LEFT JOIN categories c ON p.category_id = c.id
 LEFT JOIN ProductPrices pr ON p.id = pr.product_id AND pr.is_active = 1
 LEFT JOIN Product_Compliance comp ON p.id = comp.product_id
+LEFT JOIN Product_Inventory inv ON p.id = inv.product_id
 LEFT JOIN UserUnstichedProducts up ON p.id = up.ProductId
 WHERE up.UserId = {{user_id}}
 {{#if productId}}

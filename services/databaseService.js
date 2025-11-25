@@ -37,7 +37,9 @@ class DatabaseService {
       GetCategoryByName: this.GetCategoryByName.bind(this),
       GetCategoryById: this.GetCategoryById.bind(this),
       GetAllCategories: this.GetAllCategories.bind(this),
-      GetAllProductTypes: this.GetAllProductTypes.bind(this)
+      GetAllProductTypes: this.GetAllProductTypes.bind(this),
+      InsertProductInventory: this.InsertProductInventory.bind(this),
+      UpdateProductInventory: this.UpdateProductInventory.bind(this)
     };
   }
 
@@ -750,6 +752,53 @@ class DatabaseService {
       
     } catch (error) {
       console.error('❌ DatabaseService.GetAllBrands error:', error);
+      throw error;
+    }
+  }
+
+  // Insert product inventory using HBS template
+  async InsertProductInventory(parameters) {
+    try {
+      console.log('🔄 DatabaseService.InsertProductInventory called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('insertProductInventory');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Product inventory inserted successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.InsertProductInventory error:', error);
+      throw error;
+    }
+  }
+
+  // Update product inventory using HBS template
+  async UpdateProductInventory(productId, parameters) {
+    try {
+      console.log('🔄 DatabaseService.UpdateProductInventory called with productId:', productId, 'parameters:', parameters);
+      
+      // Add product_id to parameters
+      const updateData = { ...parameters, product_id: productId };
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('updateProductInventory');
+      const sql = template(updateData);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Product inventory updated successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.UpdateProductInventory error:', error);
       throw error;
     }
   }

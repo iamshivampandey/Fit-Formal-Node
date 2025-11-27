@@ -14,6 +14,15 @@ class DatabaseService {
       GetRoleByName: this.GetRoleByName.bind(this),
       InsertUserRole: this.InsertUserRole.bind(this),
       GetUserRoles: this.GetUserRoles.bind(this),
+      // Business Information operations
+      InsertBusinessInformation: this.InsertBusinessInformation.bind(this),
+      GetBusinessByUserId: this.GetBusinessByUserId.bind(this),
+      GetAllBusinesses: this.GetAllBusinesses.bind(this),
+      CheckBusinessExists: this.CheckBusinessExists.bind(this),
+      UpdateBusinessInformation: this.UpdateBusinessInformation.bind(this),
+      UpdateBusinessByBusinessId: this.UpdateBusinessByBusinessId.bind(this),
+      UpdateBusinessLogo: this.UpdateBusinessLogo.bind(this),
+      DeleteBusinessInformation: this.DeleteBusinessInformation.bind(this),
       // Product operations
       InsertProduct: this.InsertProduct.bind(this),
       UpdateProduct: this.UpdateProduct.bind(this),
@@ -223,6 +232,36 @@ class DatabaseService {
       
     } catch (error) {
       console.error('❌ DatabaseService.GetUserRoles error:', error);
+      throw error;
+    }
+  }
+
+  // Insert business information using HBS template
+  async InsertBusinessInformation(parameters) {
+    try {
+      console.log('🔄 DatabaseService.InsertBusinessInformation called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('insertBusinessInformation');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Business information inserted successfully');
+      console.log('📊 Insert result:', result);
+      
+      // Get the inserted business ID from the result
+      if (result && result.recordset && result.recordset.length > 0) {
+        const businessId = result.recordset[0].businessId;
+        console.log('✅ Business ID retrieved:', businessId);
+        return { success: true, businessId, result };
+      } else {
+        throw new Error('Failed to retrieve business ID after insertion');
+      }
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.InsertBusinessInformation error:', error);
       throw error;
     }
   }
@@ -799,6 +838,191 @@ class DatabaseService {
       
     } catch (error) {
       console.error('❌ DatabaseService.UpdateProductInventory error:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Business Information Operations ====================
+
+  // Get business by user ID using HBS template
+  async GetBusinessByUserId(parameters) {
+    try {
+      console.log('🔄 DatabaseService.GetBusinessByUserId called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getBusinessByUserId');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Business retrieved successfully');
+      
+      return (result && result.recordset && result.recordset.length > 0) ? result.recordset[0] : null;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetBusinessByUserId error:', error);
+      throw error;
+    }
+  }
+
+  // Get all businesses using HBS template
+  async GetAllBusinesses() {
+    try {
+      console.log('🔄 DatabaseService.GetAllBusinesses called');
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getAllBusinesses');
+      const sql = template({});
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ All businesses retrieved successfully');
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetAllBusinesses error:', error);
+      throw error;
+    }
+  }
+
+  // Check if business exists using HBS template
+  async CheckBusinessExists(parameters) {
+    try {
+      console.log('🔄 DatabaseService.CheckBusinessExists called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('checkBusinessExists');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Business check completed');
+      
+      return (result && result.recordset && result.recordset.length > 0) ? result.recordset[0] : null;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.CheckBusinessExists error:', error);
+      throw error;
+    }
+  }
+
+  // Update business information using HBS template
+  async UpdateBusinessInformation(parameters) {
+    try {
+      console.log('🔄 DatabaseService.UpdateBusinessInformation called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('updateBusinessInformation');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Business information updated successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.UpdateBusinessInformation error:', error);
+      throw error;
+    }
+  }
+
+  // Update business information by business ID dynamically
+  async UpdateBusinessByBusinessId(parameters) {
+    try {
+      console.log('🔄 DatabaseService.UpdateBusinessByBusinessId called with parameters:', parameters);
+      
+      const { businessId, ...updateFields } = parameters;
+      
+      // Build SET clause dynamically for fields that are provided
+      const setStatements = [];
+      
+      for (const [key, value] of Object.entries(updateFields)) {
+        if (value !== undefined) {
+          // Handle different data types
+          if (value === null) {
+            setStatements.push(`${key} = NULL`);
+          } else if (typeof value === 'number') {
+            setStatements.push(`${key} = ${value}`);
+          } else if (typeof value === 'boolean') {
+            setStatements.push(`${key} = ${value ? 1 : 0}`);
+          } else {
+            // String: escape single quotes by doubling them
+            const escapedValue = String(value).replace(/'/g, "''");
+            setStatements.push(`${key} = '${escapedValue}'`);
+          }
+        }
+      }
+      
+      if (setStatements.length === 0) {
+        throw new Error('No fields provided to update');
+      }
+      
+      // Add updated_at timestamp
+      setStatements.push('updated_at = GETDATE()');
+      
+      // Build final SQL
+      const sql = `UPDATE BusinessInformations SET ${setStatements.join(', ')} WHERE businessId = ${businessId}`;
+      
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Business information updated successfully by business ID');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.UpdateBusinessByBusinessId error:', error);
+      throw error;
+    }
+  }
+
+  // Update business logo only using HBS template
+  async UpdateBusinessLogo(parameters) {
+    try {
+      console.log('🔄 DatabaseService.UpdateBusinessLogo called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('updateBusinessLogo');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Business logo updated successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.UpdateBusinessLogo error:', error);
+      throw error;
+    }
+  }
+
+  // Delete business information using HBS template
+  async DeleteBusinessInformation(parameters) {
+    try {
+      console.log('🔄 DatabaseService.DeleteBusinessInformation called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('deleteBusinessInformation');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Business information deleted successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.DeleteBusinessInformation error:', error);
       throw error;
     }
   }

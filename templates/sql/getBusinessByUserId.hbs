@@ -1,0 +1,27 @@
+SELECT 
+  bi.businessId,
+  bi.userId,
+  bi.ownerName,
+  bi.BusinessName,
+  bi.Email,
+  bi.mobileNumber,
+  bi.alternateNumber,
+  bi.shopAddress,
+  bi.googleMapLink,
+  bi.gpsLatitude,
+  bi.gpsLongitude,
+  bi.workingCity,
+  bi.serviceTypes,
+  bi.specialization,
+  bi.yearsOfExperience,
+  bi.portfolioPhotos,   
+  bi.certifications,
+  bi.openingTime,
+  bi.closingTime,
+  bi.weeklyOff,
+  bi.businessLogo,
+  bi.businessDescription
+FROM BusinessInformations bi
+INNER JOIN Users u ON bi.UserId = u.id
+WHERE bi.UserId = {{UserId}} 
+

@@ -1,0 +1,5 @@
+UPDATE BusinessInformations
+SET 
+  businessLogo = {{{sqlValue businessLogo}}},
+  updated_at = GETDATE()
+WHERE businessId = {{businessId}}

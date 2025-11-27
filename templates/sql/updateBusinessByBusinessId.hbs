@@ -1,0 +1,24 @@
+UPDATE BusinessInformations
+SET 
+  {{#if ownerName}}ownerName = {{{sqlValue ownerName}}},{{/if}}
+  {{#if businessName}}businessName = {{{sqlValue businessName}}},{{/if}}
+  {{#if email}}email = {{{sqlValue email}}},{{/if}}
+  {{#if mobileNumber}}mobileNumber = {{{sqlValue mobileNumber}}},{{/if}}
+  {{#if alternateNumber}}alternateNumber = {{{sqlValue alternateNumber}}},{{/if}}
+  {{#if shopAddress}}shopAddress = {{{sqlValue shopAddress}}},{{/if}}
+  {{#if googleMapLink}}googleMapLink = {{{sqlValue googleMapLink}}},{{/if}}
+  {{#if gpsLatitude}}gpsLatitude = {{{sqlValue gpsLatitude}}},{{/if}}
+  {{#if gpsLongitude}}gpsLongitude = {{{sqlValue gpsLongitude}}},{{/if}}
+  {{#if workingCity}}workingCity = {{{sqlValue workingCity}}},{{/if}}
+  {{#if serviceTypes}}serviceTypes = {{{sqlValue serviceTypes}}},{{/if}}
+  {{#if specialization}}specialization = {{{sqlValue specialization}}},{{/if}}
+  {{#if yearsOfExperience}}yearsOfExperience = {{{sqlValue yearsOfExperience}}},{{/if}}
+  {{#if portfolioPhotos}}portfolioPhotos = {{{sqlValue portfolioPhotos}}},{{/if}}
+  {{#if certifications}}certifications = {{{sqlValue certifications}}},{{/if}}
+  {{#if openingTime}}openingTime = {{{sqlValue openingTime}}},{{/if}}
+  {{#if closingTime}}closingTime = {{{sqlValue closingTime}}},{{/if}}
+  {{#if weeklyOff}}weeklyOff = {{{sqlValue weeklyOff}}},{{/if}}
+  {{#if businessLogo}}businessLogo = {{{sqlValue businessLogo}}},{{/if}}
+  {{#if businessDescription}}businessDescription = {{{sqlValue businessDescription}}},{{/if}}
+  updated_at = GETDATE()
+WHERE businessId = {{businessId}}

@@ -1,0 +1,4 @@
+UPDATE BusinessInformation
+SET IsActive = 0, ModifiedAt = GETDATE()
+WHERE UserId = {{UserId}}
+

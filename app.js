@@ -14,6 +14,7 @@ const databaseService = require('./services/databaseService');
 // Import controllers
 const loginController = require('./controllers/loginController');
 const productController = require('./controllers/productController');
+const businessController = require('./controllers/businessController');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,8 +24,10 @@ app.db = databaseService.db;
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// Increase body size limit to handle base64 image data (matching signup API behavior)
+// Base64 images can be very large, so we set a generous limit
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
 // Serve static files (uploaded images)
 app.use('/uploads', express.static('uploads'));
@@ -38,6 +41,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api/auth', loginController);
 app.use('/api/products', productController);
+app.use('/api', businessController);
 
 // Health check endpoint
 app.get('/', (req, res) => {

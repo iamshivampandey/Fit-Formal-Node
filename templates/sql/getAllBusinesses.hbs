@@ -1,0 +1,19 @@
+SELECT 
+  bi.BusinessInformationId,
+  bi.UserId,
+  bi.BusinessName,
+  bi.BusinessEmail,
+  bi.BusinessPhone,
+  bi.GSTNumber,
+  bi.BusinessType,
+  bi.City,
+  bi.State,
+  bi.CreatedAt,
+  bi.IsActive,
+  u.FirstName,
+  u.LastName
+FROM BusinessInformation bi
+INNER JOIN Users u ON bi.UserId = u.UserId
+WHERE bi.IsActive = 1
+ORDER BY bi.CreatedAt DESC
+

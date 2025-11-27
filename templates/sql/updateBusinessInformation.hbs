@@ -1,0 +1,15 @@
+UPDATE BusinessInformation
+SET 
+  BusinessName = {{{sqlValue BusinessName}}},
+  BusinessEmail = {{{sqlValue BusinessEmail}}},
+  BusinessPhone = {{{sqlValue BusinessPhone}}},
+  GSTNumber = {{{sqlValue GSTNumber}}},
+  PanNumber = {{{sqlValue PanNumber}}},
+  Address = {{{sqlValue Address}}},
+  City = {{{sqlValue City}}},
+  State = {{{sqlValue State}}},
+  Country = {{{sqlValue Country}}},
+  ZipCode = {{{sqlValue ZipCode}}},
+  BusinessType = {{{sqlValue BusinessType}}},
+  ModifiedAt = GETDATE()
+WHERE UserId = {{UserId}}

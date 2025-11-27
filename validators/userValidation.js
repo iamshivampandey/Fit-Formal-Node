@@ -142,7 +142,114 @@ const validationRules = {
       return value;
     })
     .isIn(['Admin', 'Customer', 'Seller', 'Tailor', 'Taylorseller'])
-    .withMessage('Role name must be one of: Admin, Customer, Seller, Tailor, Taylorseller')
+    .withMessage('Role name must be one of: Admin, Customer, Seller, Tailor, Taylorseller'),
+
+  // Business Information validations (optional, for Seller/Tailor/Taylorseller roles)
+  // Accept businessInfo as a nested object
+  businessInfo: () => body('businessInfo')
+    .optional()
+    .isObject()
+    .withMessage('Business info must be an object'),
+
+  businessName: () => body('businessInfo.businessName')
+    .optional()
+    .trim()
+    .isLength({ max: 150 })
+    .withMessage('Business name must not exceed 150 characters'),
+
+  ownerName: () => body('businessInfo.ownerName')
+    .optional()
+    .trim()
+    .isLength({ max: 120 })
+    .withMessage('Owner name must not exceed 120 characters'),
+
+  businessLogo: () => body('businessInfo.businessLogo')
+    .optional()
+    .trim()
+    .isLength({ max: 500000 })
+    .withMessage('Business logo data too large'),
+
+  businessDescription: () => body('businessInfo.businessDescription')
+    .optional()
+    .trim(),
+
+  businessEmail: () => body('businessInfo.email')
+    .optional()
+    .trim(),
+
+  businessMobileNumber: () => body('businessInfo.mobileNumber')
+    .optional()
+    .trim()
+    .isLength({ min: 10, max: 15 })
+    .withMessage('Mobile number must be between 10 and 15 characters'),
+
+  alternateNumber: () => body('businessInfo.alternateNumber')
+    .optional()
+    .trim()
+    .isLength({ min: 10, max: 15 })
+    .withMessage('Alternate number must be between 10 and 15 characters'),
+
+  shopAddress: () => body('businessInfo.shopAddress')
+    .optional()
+    .trim()
+    .isLength({ max: 255 })
+    .withMessage('Shop address must not exceed 255 characters'),
+
+  googleMapLink: () => body('businessInfo.googleMapLink')
+    .optional()
+    .trim()
+    .isLength({ max: 255 })
+    .withMessage('Google map link must not exceed 255 characters'),
+
+  gpsLatitude: () => body('businessInfo.gpsLatitude')
+    .optional()
+    .trim(),
+
+  gpsLongitude: () => body('businessInfo.gpsLongitude')
+    .optional()
+    .trim(),
+
+  workingCity: () => body('businessInfo.workingCity')
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage('Working city must not exceed 100 characters'),
+
+  serviceTypes: () => body('businessInfo.serviceTypes')
+    .optional()
+    .trim(),
+
+  specialization: () => body('businessInfo.specialization')
+    .optional()
+    .trim()
+    .isLength({ max: 255 })
+    .withMessage('Specialization must not exceed 255 characters'),
+
+  yearsOfExperience: () => body('businessInfo.yearsOfExperience')
+    .optional()
+    .trim(),
+
+  portfolioPhotos: () => body('businessInfo.portfolioPhotos')
+    .optional()
+    .trim(),
+
+  certifications: () => body('businessInfo.certifications')
+    .optional()
+    .trim(),
+
+  openingTime: () => body('businessInfo.openingTime')
+    .optional()
+    .trim(),
+
+  closingTime: () => body('businessInfo.closingTime')
+    .optional()
+    .trim(),
+
+  weeklyOff: () => body('businessInfo.weeklyOff')
+    .optional()
+    .trim()
+    .isLength({ max: 20 })
+    .withMessage('Weekly off must not exceed 20 characters')
 };
 
 // Predefined validation sets for common use cases
@@ -154,7 +261,29 @@ const validationSets = {
     validationRules.firstName(),
     validationRules.lastName(),
     validationRules.phoneNumber(),
-    validationRules.roleName()
+    validationRules.roleName(),
+    // Business information fields (optional, nested object)
+    validationRules.businessInfo(),
+    validationRules.businessName(),
+    validationRules.ownerName(),
+    validationRules.businessLogo(),
+    validationRules.businessDescription(),
+    validationRules.businessEmail(),
+    validationRules.businessMobileNumber(),
+    validationRules.alternateNumber(),
+    validationRules.shopAddress(),
+    validationRules.googleMapLink(),
+    validationRules.gpsLatitude(),
+    validationRules.gpsLongitude(),
+    validationRules.workingCity(),
+    validationRules.serviceTypes(),
+    validationRules.specialization(),
+    validationRules.yearsOfExperience(),
+    validationRules.portfolioPhotos(),
+    validationRules.certifications(),
+    validationRules.openingTime(),
+    validationRules.closingTime(),
+    validationRules.weeklyOff()
   ],
 
   // User login validation

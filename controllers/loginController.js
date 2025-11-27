@@ -113,6 +113,60 @@ router.post('/signup', validationMiddleware.validateUserRegistration, async (req
       });
     }
 
+    // If role is Seller, Tailor, or Taylorseller, insert business information
+    let businessInfoResponse = null;
+    if (['Seller', 'Tailor', 'Taylorseller'].includes(roleNameToUse)) {
+      try {
+        console.log('🔄 Creating business information for role:', roleNameToUse);
+        
+        // Extract business information from request body (nested object)
+        const businessInfo = req.body.businessInfo || {};
+        console.log('📋 Business info from request:', businessInfo);
+        
+        // Create business information with provided data or defaults
+        const businessData = {
+          userId: userId,
+          businessName: businessInfo.businessName || `${firstName} ${lastName}'s Business`,
+          ownerName: businessInfo.ownerName || `${firstName} ${lastName}`,
+          businessLogo: businessInfo.businessLogo || null,
+          businessDescription: businessInfo.businessDescription || null,
+          mobileNumber: businessInfo.mobileNumber || phoneNumber || '',
+          alternateNumber: businessInfo.alternateNumber || null,
+          email: businessInfo.email || email,
+          shopAddress: businessInfo.shopAddress || null,
+          googleMapLink: businessInfo.googleMapLink || null,
+          gpsLatitude: businessInfo.gpsLatitude || null,
+          gpsLongitude: businessInfo.gpsLongitude || null,
+          workingCity: businessInfo.workingCity || null,
+          serviceTypes: businessInfo.serviceTypes || null,
+          specialization: businessInfo.specialization || null,
+          yearsOfExperience: businessInfo.yearsOfExperience || null,
+          portfolioPhotos: businessInfo.portfolioPhotos || null,
+          certifications: businessInfo.certifications || null,
+          openingTime: businessInfo.openingTime || null,
+          closingTime: businessInfo.closingTime || null,
+          weeklyOff: businessInfo.weeklyOff || null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        console.log('📋 Prepared business data for insertion:', businessData);
+        const businessResult = await databaseService.db.InsertBusinessInformation(businessData);
+        businessInfoResponse = {
+          businessId: businessResult.businessId,
+          businessName: businessData.businessName,
+          ownerName: businessData.ownerName,
+          workingCity: businessData.workingCity
+        };
+        console.log('✅ Business information created successfully:', businessInfoResponse);
+      } catch (error) {
+        console.error('❌ Error creating business information:', error);
+        console.error('❌ Error details:', error.message);
+        // Log error but don't fail the registration
+        console.log('⚠️ User created without business information');
+      }
+    }
+
     // Remove password from response
     const { password: _, ...userResponse } = newUser;
 
@@ -126,7 +180,8 @@ router.post('/signup', validationMiddleware.validateUserRegistration, async (req
           id: role.id,
           name: role.role_name,
           description: role.description
-        }
+        },
+        ...(businessInfoResponse && { businessInfo: businessInfoResponse })
       }
     });
 

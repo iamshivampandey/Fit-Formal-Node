@@ -1,0 +1,6 @@
+SELECT TailorDateAvailabilityId
+FROM TailorDateAvailability
+WHERE BusinessId = {{BusinessId}}
+  AND [Date] = CAST('{{Date}}' AS DATE);
+
+

@@ -18,11 +18,21 @@ class DatabaseService {
       InsertBusinessInformation: this.InsertBusinessInformation.bind(this),
       GetBusinessByUserId: this.GetBusinessByUserId.bind(this),
       GetAllBusinesses: this.GetAllBusinesses.bind(this),
+      GetTailorsList: this.GetTailorsList.bind(this),
+      GetTailorByUserId: this.GetTailorByUserId.bind(this),
       CheckBusinessExists: this.CheckBusinessExists.bind(this),
       UpdateBusinessInformation: this.UpdateBusinessInformation.bind(this),
       UpdateBusinessByBusinessId: this.UpdateBusinessByBusinessId.bind(this),
       UpdateBusinessLogo: this.UpdateBusinessLogo.bind(this),
       DeleteBusinessInformation: this.DeleteBusinessInformation.bind(this),
+      // Tailor Date Availability operations
+      CheckTailorDateAvailabilityExists: this.CheckTailorDateAvailabilityExists.bind(this),
+      GetTailorDateAvailabilityByBusinessId: this.GetTailorDateAvailabilityByBusinessId.bind(this),
+      GetAllTailorDateAvailability: this.GetAllTailorDateAvailability.bind(this),
+      InsertTailorDateAvailability: this.InsertTailorDateAvailability.bind(this),
+      UpdateTailorDateAvailability: this.UpdateTailorDateAvailability.bind(this),
+      // Tailor Items operations
+      GetAllTailorItems: this.GetAllTailorItems.bind(this),
       // Product operations
       InsertProduct: this.InsertProduct.bind(this),
       UpdateProduct: this.UpdateProduct.bind(this),
@@ -888,6 +898,51 @@ class DatabaseService {
     }
   }
 
+  // Get list of tailors with business information using HBS template
+  async GetTailorsList() {
+    try {
+      console.log('🔄 DatabaseService.GetTailorsList called');
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getTailorsList');
+      const sql = template({});
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Tailors list retrieved successfully');
+      console.log('📊 Number of tailors found:', result.recordset ? result.recordset.length : 0);
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetTailorsList error:', error);
+      throw error;
+    }
+  }
+
+  // Get tailor by user ID using HBS template
+  async GetTailorByUserId(parameters) {
+    try {
+      console.log('🔄 DatabaseService.GetTailorByUserId called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getTailorByUserId');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Tailor retrieved successfully');
+      
+      return (result && result.recordset && result.recordset.length > 0) ? result.recordset[0] : null;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetTailorByUserId error:', error);
+      throw error;
+    }
+  }
+
   // Check if business exists using HBS template
   async CheckBusinessExists(parameters) {
     try {
@@ -1023,6 +1078,151 @@ class DatabaseService {
       
     } catch (error) {
       console.error('❌ DatabaseService.DeleteBusinessInformation error:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Tailor Date Availability Operations ====================
+
+  // Check if tailor date availability exists by BusinessId using HBS template
+  async CheckTailorDateAvailabilityExists(parameters) {
+    try {
+      console.log('🔄 DatabaseService.CheckTailorDateAvailabilityExists called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('checkTailorDateAvailabilityExists');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Tailor date availability check completed');
+      
+      return (result && result.recordset && result.recordset.length > 0) ? result.recordset[0] : null;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.CheckTailorDateAvailabilityExists error:', error);
+      throw error;
+    }
+  }
+
+  // Get tailor date availability by BusinessId using HBS template
+  async GetTailorDateAvailabilityByBusinessId(parameters) {
+    try {
+      console.log('🔄 DatabaseService.GetTailorDateAvailabilityByBusinessId called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getTailorDateAvailabilityByBusinessId');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Tailor date availability retrieved successfully');
+      console.log('📊 Number of records found:', result.recordset ? result.recordset.length : 0);
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetTailorDateAvailabilityByBusinessId error:', error);
+      throw error;
+    }
+  }
+
+  // Get all tailor date availability using HBS template
+  async GetAllTailorDateAvailability() {
+    try {
+      console.log('🔄 DatabaseService.GetAllTailorDateAvailability called');
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getAllTailorDateAvailability');
+      const sql = template({});
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ All tailor date availability retrieved successfully');
+      console.log('📊 Number of records found:', result.recordset ? result.recordset.length : 0);
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetAllTailorDateAvailability error:', error);
+      throw error;
+    }
+  }
+
+  // Insert tailor date availability using HBS template
+  async InsertTailorDateAvailability(parameters) {
+    try {
+      console.log('🔄 DatabaseService.InsertTailorDateAvailability called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('insertTailorDateAvailability');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Tailor date availability inserted successfully');
+      console.log('📊 Insert result:', result);
+      
+      // Get the inserted ID from the result
+      if (result && result.recordset && result.recordset.length > 0) {
+        const tailorDateAvailabilityId = result.recordset[0].TailorDateAvailabilityId;
+        console.log('✅ Tailor Date Availability ID retrieved:', tailorDateAvailabilityId);
+        return { success: true, tailorDateAvailabilityId, result };
+      } else {
+        throw new Error('Failed to retrieve Tailor Date Availability ID after insertion');
+      }
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.InsertTailorDateAvailability error:', error);
+      throw error;
+    }
+  }
+
+  // Update tailor date availability using HBS template
+  async UpdateTailorDateAvailability(parameters) {
+    try {
+      console.log('🔄 DatabaseService.UpdateTailorDateAvailability called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('updateTailorDateAvailability');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Tailor date availability updated successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.UpdateTailorDateAvailability error:', error);
+      throw error;
+    }
+  }
+
+  // Get all tailor items using HBS template
+  async GetAllTailorItems() {
+    try {
+      console.log('🔄 DatabaseService.GetAllTailorItems called');
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getAllTailorItems');
+      const sql = template({});
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ All tailor items retrieved successfully');
+      console.log('📊 Number of records found:', result.recordset ? result.recordset.length : 0);
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetAllTailorItems error:', error);
       throw error;
     }
   }

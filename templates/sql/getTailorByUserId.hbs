@@ -1,0 +1,36 @@
+SELECT 
+  u.id as userId,
+  u.firstName,
+  u.lastName,
+  u.email as userEmail,
+  u.phoneNumber,
+  u.isActive,
+  bi.businessId,
+  bi.businessName,
+  bi.ownerName,
+  bi.businessLogo,
+  bi.businessDescription,
+  bi.mobileNumber as businessMobile,
+  bi.alternateNumber,
+  bi.email as businessEmail,
+  bi.shopAddress,
+  bi.googleMapLink,
+  bi.gpsLatitude,
+  bi.gpsLongitude,
+  bi.workingCity,
+  bi.serviceTypes,
+  bi.specialization,
+  bi.yearsOfExperience,
+  bi.portfolioPhotos,
+  bi.certifications,
+  bi.openingTime,
+  bi.closingTime,
+  bi.weeklyOff,
+  bi.tailoringCategories,
+  r.role_name as roleName
+FROM Users u
+INNER JOIN BusinessInformations bi ON bi.userId = u.id
+INNER JOIN UserRoles ur ON ur.user_id = u.id
+INNER JOIN Roles r ON r.id = ur.role_id
+WHERE bi.BusinessId = {{BusinessId}} AND u.isActive = 1 AND r.role_name = 'Tailor';
+

@@ -20,7 +20,8 @@ SELECT
   bi.closingTime,
   bi.weeklyOff,
   bi.businessLogo,
-  bi.businessDescription
+  bi.businessDescription,
+  bi.tailoringCategories
 FROM BusinessInformations bi
 INNER JOIN Users u ON bi.UserId = u.id
 WHERE bi.UserId = {{UserId}} 

@@ -60,6 +60,194 @@ router.get('/businesses', authenticateToken, async (req, res) => {
   }
 });
 
+// Get list of all tailors with their business information
+router.get('/tailors', authenticateToken, async (req, res) => {
+  try {
+    console.log('🔄 Get tailors list request received');
+    
+    // Call database service method
+    const tailors = await databaseService.db.GetTailorsList();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Tailors list retrieved successfully',
+      count: tailors.length,
+      data: tailors
+    });
+
+  } catch (error) {
+    console.error('❌ Error getting tailors list:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to get tailors list',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// Get tailor by businessId
+router.get('/tailor/:businessId', authenticateToken, async (req, res) => {
+  try {
+    const { businessId } = req.params;
+    console.log('🔄 Get tailor by businessId request received:', businessId);
+
+    // Call database service method
+    const tailor = await databaseService.db.GetTailorByUserId({ BusinessId: businessId });
+
+    if (tailor) {
+      return res.status(200).json({
+        success: true,
+        message: 'Tailor details retrieved successfully',
+        data: tailor
+      });
+    } else {
+      return res.status(404).json({
+        success: false,
+        message: 'No tailor found for this business ID'
+      });
+    }
+
+  } catch (error) {
+    console.error('❌ Error getting tailor by businessId:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to get tailor details',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// Get tailor date availability by BusinessId
+router.get('/tailor-date-availability/:businessId', authenticateToken, async (req, res) => {
+  try {
+    const { businessId } = req.params;
+    console.log('🔄 Get tailor date availability by businessId request received:', businessId);
+
+    // Call database service method
+    const availability = await databaseService.db.GetTailorDateAvailabilityByBusinessId({ BusinessId: businessId });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Tailor date availability retrieved successfully',
+      count: availability.length,
+      data: availability
+    });
+
+  } catch (error) {
+    console.error('❌ Error getting tailor date availability:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to get tailor date availability',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// Get all tailor date availability
+router.get('/tailor-date-availability', authenticateToken, async (req, res) => {
+  try {
+    console.log('🔄 Get all tailor date availability request received');
+    
+    // Call database service method
+    const availability = await databaseService.db.GetAllTailorDateAvailability();
+
+    return res.status(200).json({
+      success: true,
+      message: 'All tailor date availability retrieved successfully',
+      count: availability.length,
+      data: availability
+    });
+
+  } catch (error) {
+    console.error('❌ Error getting all tailor date availability:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to get tailor date availability',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// Create/Update tailor date availability
+router.post('/tailor-date-availability', authenticateToken, async (req, res) => {
+  try {
+    const {
+      businessId,
+      date,
+      isClosed
+    } = req.body;
+
+    // Validate required fields
+    if (!businessId) {
+      return res.status(400).json({
+        success: false,
+        message: 'BusinessId is required'
+      });
+    }
+
+    if (!date) {
+      return res.status(400).json({
+        success: false,
+        message: 'Date is required'
+      });
+    }
+
+    if ( isClosed  === undefined || isClosed === null) {
+      return res.status(400).json({
+        success: false,
+        message: 'IsClosed is required'
+      });
+    }
+
+    console.log('🔄 Create/Update tailor date availability request received');
+    console.log('📋 BusinessId:', businessId);
+    console.log('📋 Date:', date);
+
+
+    // Check if tailor date availability already exists for this BusinessId
+    const existingAvailability = await databaseService.db.CheckTailorDateAvailabilityExists({ BusinessId: businessId, Date: date });
+
+    if (existingAvailability) {
+      // Update existing record
+      console.log('🔄 Updating existing tailor date availability');
+      await databaseService.db.UpdateTailorDateAvailability({
+        TailorDateAvailabilityId: existingAvailability.TailorDateAvailabilityId,
+        Date: date,
+        IsClosed: isClosed
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: 'Tailor date availability updated successfully'
+      });
+    } else {
+      // Insert new record
+      console.log('🔄 Creating new tailor date availability');
+      const result = await databaseService.db.InsertTailorDateAvailability({
+        BusinessId: businessId,
+        Date: date,
+        IsClosed: isClosed
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: 'Tailor date availability created successfully',
+        data: {
+          tailorDateAvailabilityId: result.tailorDateAvailabilityId
+        }
+      });
+    }
+
+  } catch (error) {
+    console.error('❌ Error saving tailor date availability:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to save tailor date availability',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
 // Create/Update business information
 router.post('/business', authenticateToken, async (req, res) => {
   try {
@@ -152,7 +340,8 @@ router.put('/business/:businessId', authenticateToken, async (req, res) => {
       closingTime,
       weeklyOff,
       businessLogo,
-      businessDescription
+      businessDescription,
+      tailoringCategories
     } = req.body;
 
     console.log('📋 Update business request - businessId:', businessId);
@@ -183,6 +372,7 @@ router.put('/business/:businessId', authenticateToken, async (req, res) => {
     if (weeklyOff !== undefined) updateData.weeklyOff = weeklyOff;
     if (businessLogo !== undefined) updateData.businessLogo = businessLogo;
     if (businessDescription !== undefined) updateData.businessDescription = businessDescription;
+    if (tailoringCategories !== undefined) updateData.tailoringCategories = tailoringCategories;
 
     // Update business by business ID with only provided fields
     const result = await databaseService.db.UpdateBusinessByBusinessId(updateData);
@@ -285,6 +475,31 @@ router.delete('/business/:userId', authenticateToken, async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Failed to delete business information',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// Get all tailor items
+router.get('/tailor-items', authenticateToken, async (req, res) => {
+  try {
+    console.log('🔄 Get all tailor items request received');
+    
+    // Call database service method
+    const tailorItems = await databaseService.db.GetAllTailorItems();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Tailor items retrieved successfully',
+      count: tailorItems.length,
+      data: tailorItems
+    });
+
+  } catch (error) {
+    console.error('❌ Error getting tailor items:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to get tailor items',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }

@@ -23,6 +23,16 @@ Handlebars.registerHelper('sqlValue', function(value) {
   return `'${String(value).replace(/'/g, "''")}'`;
 });
 
+// Helper to check if a value is defined (not undefined)
+Handlebars.registerHelper('isDefined', function(value) {
+  return value !== undefined;
+});
+
+// Helper for equality check
+Handlebars.registerHelper('eq', function(a, b) {
+  return a === b;
+});
+
 // Load and compile SQL templates
 const loadTemplate = (templateName) => {
   try {

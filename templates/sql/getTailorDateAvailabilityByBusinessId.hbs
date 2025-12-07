@@ -1,0 +1,11 @@
+SELECT 
+  TailorDateAvailabilityId,
+  BusinessId,
+  Date,
+  IsClosed,
+  CreatedAt,
+  UpdatedAt
+FROM TailorDateAvailability
+WHERE BusinessId = {{BusinessId}}
+ORDER BY Date DESC;
+

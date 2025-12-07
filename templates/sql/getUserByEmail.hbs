@@ -1,3 +1,4 @@
-SELECT id, email, password, firstName, lastName, phoneNumber, createdAt, modifiedAt, isActive 
-FROM Users 
-WHERE email = '{{Email}}';
+SELECT u.id, u.email, u.password, u.firstName, u.lastName, u.phoneNumber, u.createdAt, u.modifiedAt, u.isActive, bi.BusinessId
+FROM Users u
+left join BusinessInformations bi on u.id = bi.userId
+WHERE u.email = '{{Email}}';

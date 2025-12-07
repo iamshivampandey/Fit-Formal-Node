@@ -1,0 +1,8 @@
+UPDATE TailorDateAvailability
+SET 
+  {{#if Date}}Date = {{{sqlValue Date}}},{{/if}}
+  {{#if (isDefined IsClosed)}}IsClosed = {{{sqlValue IsClosed}}},{{/if}}
+  UpdatedAt = GETDATE()
+WHERE TailorDateAvailabilityId = {{TailorDateAvailabilityId}}
+
+

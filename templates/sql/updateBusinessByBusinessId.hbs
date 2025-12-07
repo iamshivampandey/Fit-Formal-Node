@@ -20,5 +20,6 @@ SET
   {{#if weeklyOff}}weeklyOff = {{{sqlValue weeklyOff}}},{{/if}}
   {{#if businessLogo}}businessLogo = {{{sqlValue businessLogo}}},{{/if}}
   {{#if businessDescription}}businessDescription = {{{sqlValue businessDescription}}},{{/if}}
+  {{#if tailoringCategories}}tailoringCategories = {{{sqlValue tailoringCategories}}},{{/if}}
   updated_at = GETDATE()
 WHERE businessId = {{businessId}}

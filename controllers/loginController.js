@@ -146,6 +146,7 @@ router.post('/signup', validationMiddleware.validateUserRegistration, async (req
           openingTime: businessInfo.openingTime || null,
           closingTime: businessInfo.closingTime || null,
           weeklyOff: businessInfo.weeklyOff || null,
+          tailoringCategories: businessInfo.tailoringCategories || null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         };

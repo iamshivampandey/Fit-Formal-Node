@@ -20,6 +20,7 @@ INSERT INTO BusinessInformations (
   openingTime,
   closingTime,
   weeklyOff,
+  tailoringCategories,
   created_at,
   updated_at
 )
@@ -46,6 +47,7 @@ VALUES (
   {{#if openingTime}}'{{openingTime}}'{{else}}NULL{{/if}},
   {{#if closingTime}}'{{closingTime}}'{{else}}NULL{{/if}},
   {{#if weeklyOff}}'{{weeklyOff}}'{{else}}NULL{{/if}},
+  {{#if tailoringCategories}}'{{tailoringCategories}}'{{else}}NULL{{/if}},
   {{#if created_at}}'{{created_at}}'{{else}}GETDATE(){{/if}},
   {{#if updated_at}}'{{updated_at}}'{{else}}GETDATE(){{/if}}
 );

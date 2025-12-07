@@ -1,0 +1,16 @@
+INSERT INTO TailorDateAvailability (
+  BusinessId,
+  Date,
+  IsClosed,
+  CreatedAt,
+  UpdatedAt
+)
+OUTPUT INSERTED.TailorDateAvailabilityId
+VALUES (
+  {{BusinessId}},
+  {{#if Date}}'{{Date}}'{{else}}GETDATE(){{/if}},
+  {{#if (isDefined IsClosed)}}{{{sqlValue IsClosed}}}{{else}}0{{/if}},
+  {{#if CreatedAt}}'{{CreatedAt}}'{{else}}GETDATE(){{/if}},
+  {{#if UpdatedAt}}'{{UpdatedAt}}'{{else}}GETDATE(){{/if}}
+);
+

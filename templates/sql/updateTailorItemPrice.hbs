@@ -1,0 +1,12 @@
+UPDATE TailorItemPrices
+SET 
+  {{#if FullPrice}}FullPrice = {{{sqlValue FullPrice}}},{{/if}}
+  {{#if DiscountPrice}}DiscountPrice = {{{sqlValue DiscountPrice}}},{{/if}}
+  {{#if DiscountType}}DiscountType = {{{sqlValue DiscountType}}},{{/if}}
+  {{#if DiscountValue}}DiscountValue = {{{sqlValue DiscountValue}}},{{/if}}
+  {{#if EstimatedDays}}EstimatedDays = {{{sqlValue EstimatedDays}}},{{/if}}
+  {{#if (isDefined IsAvailable)}}IsAvailable = {{{sqlValue IsAvailable}}},{{/if}}
+  {{#if Notes}}Notes = {{{sqlValue Notes}}},{{/if}}
+  UpdatedAt = GETDATE()
+WHERE BusinessId = {{BusinessId}} AND {{#if ItemId}}ItemId = {{ItemId}}{{else}}ItemId IS NULL{{/if}}
+

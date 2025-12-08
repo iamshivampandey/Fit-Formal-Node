@@ -146,7 +146,6 @@ router.post('/signup', validationMiddleware.validateUserRegistration, async (req
           openingTime: businessInfo.openingTime || null,
           closingTime: businessInfo.closingTime || null,
           weeklyOff: businessInfo.weeklyOff || null,
-          tailoringCategories: businessInfo.tailoringCategories || null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         };
@@ -160,6 +159,65 @@ router.post('/signup', validationMiddleware.validateUserRegistration, async (req
           workingCity: businessData.workingCity
         };
         console.log('✅ Business information created successfully:', businessInfoResponse);
+
+        // Insert tailoringCategoriesWithDetailsArray into TailorItemPrices
+        // Check multiple possible sources: array directly or JSON string in tailoringCategoriesDetails
+        let tailoringCategoriesWithDetailsArray = req.body.tailoringCategoriesWithDetailsArray || businessInfo.tailoringCategoriesWithDetailsArray;
+        
+        // If not found as array, check tailoringCategoriesDetails (might be a JSON string)
+        if (!tailoringCategoriesWithDetailsArray && businessInfo.tailoringCategoriesDetails) {
+          try {
+            console.log('🔄 Found tailoringCategoriesDetails, attempting to parse JSON string');
+            const parsedDetails = typeof businessInfo.tailoringCategoriesDetails === 'string' 
+              ? JSON.parse(businessInfo.tailoringCategoriesDetails) 
+              : businessInfo.tailoringCategoriesDetails;
+            
+            if (Array.isArray(parsedDetails)) {
+              tailoringCategoriesWithDetailsArray = parsedDetails;
+              console.log('✅ Successfully parsed tailoringCategoriesDetails');
+            }
+          } catch (parseError) {
+            console.error('❌ Error parsing tailoringCategoriesDetails:', parseError);
+            console.log('⚠️ Could not parse tailoringCategoriesDetails as JSON');
+          }
+        }
+        
+        if (tailoringCategoriesWithDetailsArray && Array.isArray(tailoringCategoriesWithDetailsArray) && tailoringCategoriesWithDetailsArray.length > 0) {
+          try {
+            console.log('🔄 Inserting tailor item prices for business:', businessResult.businessId);
+            console.log('📋 Tailoring categories with details array:', tailoringCategoriesWithDetailsArray);
+            
+            const currentTime = new Date().toISOString();
+            const insertPromises = tailoringCategoriesWithDetailsArray.map(async (item) => {
+              const tailorItemPriceData = {
+                BusinessId: businessResult.businessId,
+                ItemId: item.ItemId || null,
+                FullPrice: item.FullPrice || null,
+                DiscountPrice: item.DiscountPrice || null,
+                DiscountType: item.DiscountType || null,
+                DiscountValue: item.DiscountValue || null,
+                EstimatedDays: item.EstimatedDays || null,
+                IsAvailable: item.IsAvailable !== undefined ? item.IsAvailable : true,
+                Notes: item.Notes || null,
+                CreatedAt: currentTime,
+                UpdatedAt: currentTime
+              };
+              
+              console.log('📋 Inserting tailor item price:', tailorItemPriceData);
+              return await databaseService.db.InsertTailorItemPrice(tailorItemPriceData);
+            });
+            
+            await Promise.all(insertPromises);
+            console.log('✅ All tailor item prices inserted successfully');
+          } catch (error) {
+            console.error('❌ Error inserting tailor item prices:', error);
+            console.error('❌ Error details:', error.message);
+            // Log error but don't fail the registration
+            console.log('⚠️ Business created but failed to insert tailor item prices');
+          }
+        } else {
+          console.log('ℹ️ No tailoringCategoriesWithDetailsArray or tailoringCategoriesDetails provided or empty array');
+        }
       } catch (error) {
         console.error('❌ Error creating business information:', error);
         console.error('❌ Error details:', error.message);

@@ -15,10 +15,25 @@ router.get('/business/:userId', authenticateToken, async (req, res) => {
     const business = await databaseService.db.GetBusinessByUserId({ UserId: userId });
 
     if (business) {
+      // Get TailorItemPrices details using businessId
+      let tailorItemPrices = [];
+      if (business.businessId) {
+        try {
+          tailorItemPrices = await databaseService.db.GetTailorItemPricesByBusinessId({ BusinessId: business.businessId });
+          console.log('✅ Tailor item prices retrieved for business:', business.businessId);
+        } catch (error) {
+          console.error('❌ Error getting tailor item prices:', error);
+          // Continue without failing the request
+        }
+      }
+
       return res.status(200).json({
         success: true,
         message: 'Business details retrieved successfully',
-        data: business
+        data: {
+          ...business,
+          tailorItemPrices: tailorItemPrices
+        }
       });
     } else {
       return res.status(404).json({
@@ -378,6 +393,86 @@ router.put('/business/:businessId', authenticateToken, async (req, res) => {
     const result = await databaseService.db.UpdateBusinessByBusinessId(updateData);
 
     if (result && result.rowsAffected && result.rowsAffected[0] > 0) {
+      // Handle tailor item prices update/insert logic
+      let tailoringCategoriesWithDetailsArray = req.body.tailoringCategoriesDetails;
+      
+      // If not found as array, check tailoringCategoriesDetails (might be a JSON string)
+      if (!tailoringCategoriesWithDetailsArray && req.body.tailoringCategoriesDetails) {
+        try {
+          console.log('🔄 Found tailoringCategoriesDetails, attempting to parse JSON string');
+          const parsedDetails = typeof req.body.tailoringCategoriesDetails === 'string' 
+            ? JSON.parse(req.body.tailoringCategoriesDetails) 
+            : req.body.tailoringCategoriesDetails;
+          
+          if (Array.isArray(parsedDetails)) {
+            tailoringCategoriesWithDetailsArray = parsedDetails;
+            console.log('✅ Successfully parsed tailoringCategoriesDetails');
+          }
+        } catch (parseError) {
+          console.error('❌ Error parsing tailoringCategoriesDetails:', parseError);
+          console.log('⚠️ Could not parse tailoringCategoriesDetails as JSON');
+        }
+      }
+      
+      if (tailoringCategoriesWithDetailsArray && Array.isArray(tailoringCategoriesWithDetailsArray) && tailoringCategoriesWithDetailsArray.length > 0) {
+        try {
+          console.log('🔄 Processing tailor item prices for business:', businessId);
+          console.log('📋 Tailoring categories with details array:', tailoringCategoriesWithDetailsArray);
+          
+          // Get existing tailor item prices for this business
+          const existingPrices = await databaseService.db.GetTailorItemPricesByBusinessId({ BusinessId: businessId });
+          console.log('📋 Existing tailor item prices:', existingPrices);
+          
+          // Create a map of existing prices by ItemId for quick lookup
+          const existingPricesMap = {};
+          existingPrices.forEach(price => {
+            if (price.ItemId !== null && price.ItemId !== undefined) {
+              existingPricesMap[price.ItemId] = price;
+            }
+          });
+          
+          const currentTime = new Date().toISOString();
+          const updateInsertPromises = tailoringCategoriesWithDetailsArray.map(async (item) => {
+            const tailorItemPriceData = {
+              BusinessId: businessId,
+              ItemId: item.ItemId || null,
+              FullPrice: item.FullPrice || null,
+              DiscountPrice: item.DiscountPrice || null,
+              DiscountType: item.DiscountType || null,
+              DiscountValue: item.DiscountValue || null,
+              EstimatedDays: item.EstimatedDays || null,
+              IsAvailable: item.IsAvailable !== undefined ? item.IsAvailable : true,
+              Notes: item.Notes || null,
+              CreatedAt: currentTime,
+              UpdatedAt: currentTime
+            };
+            
+            // Check if this item already exists (by BusinessId and ItemId)
+            const existingPrice = item.ItemId ? existingPricesMap[item.ItemId] : null;
+            
+            if (existingPrice) {
+              // Update existing record
+              console.log('🔄 Updating existing tailor item price for ItemId:', item.ItemId);
+              return await databaseService.db.UpdateTailorItemPrice(tailorItemPriceData);
+            } else {
+              // Insert new record
+              console.log('📋 Inserting new tailor item price for ItemId:', item.ItemId);
+              return await databaseService.db.InsertTailorItemPrice(tailorItemPriceData);
+            }
+          });
+          
+          await Promise.all(updateInsertPromises);
+          console.log('✅ All tailor item prices processed successfully');
+        } catch (error) {
+          console.error('❌ Error processing tailor item prices:', error);
+          console.error('❌ Error details:', error.message);
+          // Log error but don't fail the update
+          console.log('⚠️ Business updated but failed to process tailor item prices');
+        }
+      } else {
+        console.log('ℹ️ No tailoringCategoriesWithDetailsArray or tailoringCategoriesDetails provided or empty array');
+      }
+      
       return res.status(200).json({
         success: true,
         message: 'Business information updated successfully'
@@ -481,7 +576,7 @@ router.delete('/business/:userId', authenticateToken, async (req, res) => {
 });
 
 // Get all tailor items
-router.get('/tailor-items', authenticateToken, async (req, res) => {
+router.get('/tailor-items', async (req, res) => {
   try {
     console.log('🔄 Get all tailor items request received');
     

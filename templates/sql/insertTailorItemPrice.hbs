@@ -1,0 +1,27 @@
+INSERT INTO TailorItemPrices (
+    BusinessId,
+    ItemId,
+    FullPrice,
+    DiscountPrice,
+    DiscountType,
+    DiscountValue,
+    EstimatedDays,
+    IsAvailable,
+    Notes,
+    CreatedAt,
+    UpdatedAt
+)
+VALUES (
+    {{BusinessId}},
+    {{ItemId}},
+    {{#if FullPrice}}{{{sqlValue FullPrice}}}{{else}}NULL{{/if}},
+    {{#if DiscountPrice}}{{{sqlValue DiscountPrice}}}{{else}}NULL{{/if}},
+    {{#if DiscountType}}{{{sqlValue DiscountType}}}{{else}}NULL{{/if}},
+    {{#if DiscountValue}}{{{sqlValue DiscountValue}}}{{else}}NULL{{/if}},
+    {{#if EstimatedDays}}{{{sqlValue EstimatedDays}}}{{else}}NULL{{/if}},
+    {{{sqlValue IsAvailable}}},
+    {{#if Notes}}{{{sqlValue Notes}}}{{else}}NULL{{/if}},
+    {{#if CreatedAt}}'{{CreatedAt}}'{{else}}GETDATE(){{/if}},
+    {{#if UpdatedAt}}'{{UpdatedAt}}'{{else}}GETDATE(){{/if}}
+);
+

@@ -33,6 +33,9 @@ class DatabaseService {
       UpdateTailorDateAvailability: this.UpdateTailorDateAvailability.bind(this),
       // Tailor Items operations
       GetAllTailorItems: this.GetAllTailorItems.bind(this),
+      InsertTailorItemPrice: this.InsertTailorItemPrice.bind(this),
+      UpdateTailorItemPrice: this.UpdateTailorItemPrice.bind(this),
+      GetTailorItemPricesByBusinessId: this.GetTailorItemPricesByBusinessId.bind(this),
       // Product operations
       InsertProduct: this.InsertProduct.bind(this),
       UpdateProduct: this.UpdateProduct.bind(this),
@@ -1223,6 +1226,73 @@ class DatabaseService {
       
     } catch (error) {
       console.error('❌ DatabaseService.GetAllTailorItems error:', error);
+      throw error;
+    }
+  }
+
+  // Insert tailor item price using HBS template
+  async InsertTailorItemPrice(parameters) {
+    try {
+      console.log('🔄 DatabaseService.InsertTailorItemPrice called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('insertTailorItemPrice');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Tailor item price inserted successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.InsertTailorItemPrice error:', error);
+      throw error;
+    }
+  }
+
+  // Get tailor item prices by BusinessId using HBS template
+  async GetTailorItemPricesByBusinessId(parameters) {
+    try {
+      console.log('🔄 DatabaseService.GetTailorItemPricesByBusinessId called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getTailorItemPricesByBusinessId');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Tailor item prices retrieved successfully');
+      console.log('📊 Number of records found:', result.recordset ? result.recordset.length : 0);
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetTailorItemPricesByBusinessId error:', error);
+      throw error;
+    }
+  }
+
+  // Update tailor item price using HBS template
+  async UpdateTailorItemPrice(parameters) {
+    try {
+      console.log('🔄 DatabaseService.UpdateTailorItemPrice called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('updateTailorItemPrice');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Tailor item price updated successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.UpdateTailorItemPrice error:', error);
       throw error;
     }
   }

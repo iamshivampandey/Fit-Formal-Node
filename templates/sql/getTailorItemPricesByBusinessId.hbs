@@ -1,0 +1,24 @@
+
+SELECT 
+  tip.TailorItemPriceId,
+  tip.BusinessId,
+  tip.ItemId,
+  tip.FullPrice,
+  tip.DiscountPrice,
+  tip.DiscountType,
+  tip.DiscountValue,
+  tip.EstimatedDays,
+  tip.IsAvailable,
+  tip.Notes,
+  tip.CreatedAt,
+  tip.UpdatedAt,
+  ti.Name
+FROM TailorItemPrices tip
+left join TailorItems ti on tip.ItemId = ti.ItemId
+WHERE BusinessId  = {{BusinessId}} AND tip.IsAvailable = 1
+ORDER BY CreatedAt DESC;
+
+
+
+
+

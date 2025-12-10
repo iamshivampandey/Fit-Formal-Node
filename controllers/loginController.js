@@ -124,7 +124,7 @@ router.post('/signup', validationMiddleware.validateUserRegistration, async (req
         console.log('📋 Business info from request:', businessInfo);
         
         // Create business information with provided data or defaults
-        const businessData = {
+        const businessData =  {
           userId: userId,
           businessName: businessInfo.businessName || `${firstName} ${lastName}'s Business`,
           ownerName: businessInfo.ownerName || `${firstName} ${lastName}`,

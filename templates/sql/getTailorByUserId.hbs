@@ -26,8 +26,25 @@ SELECT
   bi.openingTime,
   bi.closingTime,
   bi.weeklyOff,
-  bi.tailoringCategories,
-  r.role_name as roleName
+  --ti.name,
+  r.role_name as roleName,
+  (
+      SELECT
+          tip.TailorItemPriceId,
+          tip.ItemId,
+		  ti.Name,
+          tip.FullPrice,
+          tip.DiscountPrice,
+          tip.DiscountType,
+          tip.DiscountValue,
+          tip.EstimatedDays,
+          tip.IsAvailable,
+          tip.Notes
+      FROM TailorItemPrices tip
+	  Inner Join TailorItems ti on tip.ItemId = ti.ItemId
+      WHERE tip.BusinessId = bi.businessId
+      FOR JSON PATH
+  ) AS tailorItemPrices
 FROM Users u
 INNER JOIN BusinessInformations bi ON bi.userId = u.id
 INNER JOIN UserRoles ur ON ur.user_id = u.id

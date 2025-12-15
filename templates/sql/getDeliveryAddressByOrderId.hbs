@@ -1,0 +1,21 @@
+SELECT 
+  da.deliveryAddressId,
+  da.orderId,
+  da.userId,
+  da.fullName,
+  da.phoneNumber,
+  da.alternatePhone,
+  da.addressLine1,
+  da.addressLine2,
+  da.landmark,
+  da.city,
+  da.state,
+  da.pincode,
+  da.addressType,
+  da.deliveryInstructions,
+  da.googleMapLink,
+  da.createdAt,
+  da.updatedAt
+FROM DeliveryAddresses da
+WHERE da.orderId = {{orderId}};
+

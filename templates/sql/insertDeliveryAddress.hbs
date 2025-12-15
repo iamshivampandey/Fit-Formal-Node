@@ -1,0 +1,38 @@
+INSERT INTO DeliveryAddresses (
+  orderId,
+  userId,
+  fullName,
+  phoneNumber,
+  alternatePhone,
+  addressLine1,
+  addressLine2,
+  landmark,
+  city,
+  state,
+  pincode,
+  addressType,
+  deliveryInstructions,
+  googleMapLink,
+  createdAt,
+  updatedAt
+)
+OUTPUT INSERTED.deliveryAddressId
+VALUES (
+  {{orderId}},
+  {{#if userId}}{{userId}}{{else}}NULL{{/if}},
+  '{{escapeSQL fullName}}',
+  '{{escapeSQL phoneNumber}}',
+  {{#if alternatePhone}}'{{escapeSQL alternatePhone}}'{{else}}NULL{{/if}},
+  '{{escapeSQL addressLine1}}',
+  {{#if addressLine2}}'{{escapeSQL addressLine2}}'{{else}}NULL{{/if}},
+  {{#if landmark}}'{{escapeSQL landmark}}'{{else}}NULL{{/if}},
+  '{{escapeSQL city}}',
+  '{{escapeSQL state}}',
+  '{{escapeSQL pincode}}',
+  {{#if addressType}}'{{addressType}}'{{else}}'Home'{{/if}},
+  {{#if deliveryInstructions}}'{{escapeSQL deliveryInstructions}}'{{else}}NULL{{/if}},
+  {{#if googleMapLink}}'{{escapeSQL googleMapLink}}'{{else}}NULL{{/if}},
+  {{#if createdAt}}'{{createdAt}}'{{else}}GETDATE(){{/if}},
+  {{#if updatedAt}}'{{updatedAt}}'{{else}}GETDATE(){{/if}}
+);
+

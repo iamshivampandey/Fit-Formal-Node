@@ -1,0 +1,13 @@
+UPDATE Orders
+SET 
+  {{#if customerId}}customerId = {{customerId}},{{/if}}
+  {{#if orderDate}}orderDate = '{{orderDate}}',{{/if}}
+  {{#if orderType}}orderType = '{{orderType}}',{{/if}}
+  {{#if totalAmount}}totalAmount = {{totalAmount}},{{/if}}
+  {{#if paymentStatus}}paymentStatus = '{{paymentStatus}}',{{/if}}
+  {{#if advancePaid}}advancePaid = {{advancePaid}},{{/if}}
+  {{#if deliveryDate}}deliveryDate = '{{deliveryDate}}',{{/if}}
+  {{#if notes}}notes = '{{escapeSQL notes}}',{{/if}}
+  updatedAt = GETDATE()
+WHERE orderId = {{orderId}};
+

@@ -1,0 +1,28 @@
+INSERT INTO Orders (
+  customerId,
+  orderDate,
+  orderType,
+  totalAmount,
+  paymentStatus,
+  advancePaid,
+  deliveryDate,
+  notes,
+  createdBy,
+  createdAt,
+  updatedAt
+)
+OUTPUT INSERTED.orderId
+VALUES (
+  {{customerId}},
+  {{#if orderDate}}'{{orderDate}}'{{else}}GETDATE(){{/if}},
+  {{#if orderType}}'{{orderType}}'{{else}}NULL{{/if}},
+  {{#if totalAmount}}{{totalAmount}}{{else}}0{{/if}},
+  {{#if paymentStatus}}'{{paymentStatus}}'{{else}}'Pending'{{/if}},
+  {{#if advancePaid}}{{advancePaid}}{{else}}0{{/if}},
+  {{#if deliveryDate}}'{{deliveryDate}}'{{else}}NULL{{/if}},
+  {{#if notes}}'{{escapeSQL notes}}'{{else}}NULL{{/if}},
+  {{createdBy}},
+  {{#if createdAt}}'{{createdAt}}'{{else}}GETDATE(){{/if}},
+  {{#if updatedAt}}'{{updatedAt}}'{{else}}GETDATE(){{/if}}
+);
+

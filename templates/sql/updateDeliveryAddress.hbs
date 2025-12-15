@@ -1,0 +1,17 @@
+UPDATE DeliveryAddresses
+SET 
+  {{#if fullName}}fullName = '{{escapeSQL fullName}}',{{/if}}
+  {{#if phoneNumber}}phoneNumber = '{{escapeSQL phoneNumber}}',{{/if}}
+  {{#if alternatePhone}}alternatePhone = '{{escapeSQL alternatePhone}}',{{/if}}
+  {{#if addressLine1}}addressLine1 = '{{escapeSQL addressLine1}}',{{/if}}
+  {{#if addressLine2}}addressLine2 = '{{escapeSQL addressLine2}}',{{/if}}
+  {{#if landmark}}landmark = '{{escapeSQL landmark}}',{{/if}}
+  {{#if city}}city = '{{escapeSQL city}}',{{/if}}
+  {{#if state}}state = '{{escapeSQL state}}',{{/if}}
+  {{#if pincode}}pincode = '{{escapeSQL pincode}}',{{/if}}
+  {{#if addressType}}addressType = '{{addressType}}',{{/if}}
+  {{#if deliveryInstructions}}deliveryInstructions = '{{escapeSQL deliveryInstructions}}',{{/if}}
+  {{#if googleMapLink}}googleMapLink = '{{escapeSQL googleMapLink}}',{{/if}}
+  updatedAt = GETDATE()
+WHERE deliveryAddressId = {{deliveryAddressId}};
+

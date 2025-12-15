@@ -1,0 +1,28 @@
+SELECT 
+  o.orderId,
+  o.customerId,
+  o.orderDate,
+  o.orderType,
+  o.totalAmount,
+  o.paymentStatus,
+  o.advancePaid,
+  o.deliveryDate,
+  o.notes,
+  o.createdBy,
+  o.createdAt,
+  o.updatedAt
+FROM Orders o
+{{#if orderBy}}
+ORDER BY {{orderBy}}
+{{else}}
+ORDER BY o.createdAt DESC
+{{/if}}
+{{#if limit}}
+{{#if offset}}
+OFFSET {{offset}} ROWS
+FETCH NEXT {{limit}} ROWS ONLY
+{{else}}
+FETCH NEXT {{limit}} ROWS ONLY
+{{/if}}
+{{/if}};
+

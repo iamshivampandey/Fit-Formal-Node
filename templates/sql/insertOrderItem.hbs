@@ -1,0 +1,38 @@
+INSERT INTO OrderItems (
+  orderId,
+  itemType,
+  productCode,
+  description,
+  shopId,
+  tailorId,
+  quantity,
+  unit,
+  unitPrice,
+  status,
+  notes,
+  measurementDate,
+  measurementSlot,
+  stitchingDate,
+  createdAt,
+  updatedAt
+)
+OUTPUT INSERTED.orderItemId
+VALUES (
+  {{orderId}},
+  {{#if itemType}}'{{itemType}}'{{else}}NULL{{/if}},
+  {{#if productCode}}'{{productCode}}'{{else}}NULL{{/if}},
+  {{#if description}}'{{escapeSQL description}}'{{else}}NULL{{/if}},
+  {{#if shopId}}{{shopId}}{{else}}NULL{{/if}},
+  {{#if tailorId}}{{tailorId}}{{else}}NULL{{/if}},
+  {{#if quantity}}{{quantity}}{{else}}1{{/if}},
+  {{#if unit}}'{{unit}}'{{else}}NULL{{/if}},
+  {{#if unitPrice}}{{unitPrice}}{{else}}0{{/if}},
+  {{#if status}}'{{status}}'{{else}}'Pending'{{/if}},
+  {{#if notes}}'{{escapeSQL notes}}'{{else}}NULL{{/if}},
+  {{#if measurementDate}}'{{measurementDate}}'{{else}}NULL{{/if}},
+  {{#if measurementSlot}}'{{measurementSlot}}'{{else}}NULL{{/if}},
+  {{#if stitchingDate}}'{{stitchingDate}}'{{else}}NULL{{/if}},
+  {{#if createdAt}}'{{createdAt}}'{{else}}GETDATE(){{/if}},
+  {{#if updatedAt}}'{{updatedAt}}'{{else}}GETDATE(){{/if}}
+);
+

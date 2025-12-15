@@ -1,0 +1,23 @@
+SELECT 
+  oi.orderItemId,
+  oi.orderId,
+  oi.itemType,
+  oi.productCode,
+  oi.description,
+  oi.shopId,
+  oi.tailorId,
+  oi.quantity,
+  oi.unit,
+  oi.unitPrice,
+  oi.itemTotal,
+  oi.status,
+  oi.notes,
+  oi.measurementDate,
+  oi.measurementSlot,
+  oi.stitchingDate,
+  oi.createdAt,
+  oi.updatedAt
+FROM OrderItems oi
+WHERE oi.orderId = {{orderId}}
+ORDER BY oi.createdAt ASC;
+

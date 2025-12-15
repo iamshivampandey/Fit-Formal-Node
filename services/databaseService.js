@@ -61,7 +61,25 @@ class DatabaseService {
       GetAllCategories: this.GetAllCategories.bind(this),
       GetAllProductTypes: this.GetAllProductTypes.bind(this),
       InsertProductInventory: this.InsertProductInventory.bind(this),
-      UpdateProductInventory: this.UpdateProductInventory.bind(this)
+      UpdateProductInventory: this.UpdateProductInventory.bind(this),
+      // Order operations
+      InsertOrder: this.InsertOrder.bind(this),
+      GetOrderById: this.GetOrderById.bind(this),
+      GetAllOrders: this.GetAllOrders.bind(this),
+      GetOrdersByCustomerId: this.GetOrdersByCustomerId.bind(this),
+      UpdateOrder: this.UpdateOrder.bind(this),
+      DeleteOrder: this.DeleteOrder.bind(this),
+      // OrderItem operations
+      InsertOrderItem: this.InsertOrderItem.bind(this),
+      GetOrderItemsByOrderId: this.GetOrderItemsByOrderId.bind(this),
+      UpdateOrderItem: this.UpdateOrderItem.bind(this),
+      DeleteOrderItem: this.DeleteOrderItem.bind(this),
+      // DeliveryAddress operations
+      InsertDeliveryAddress: this.InsertDeliveryAddress.bind(this),
+      GetDeliveryAddressByOrderId: this.GetDeliveryAddressByOrderId.bind(this),
+      GetDeliveryAddressesByUserId: this.GetDeliveryAddressesByUserId.bind(this),
+      UpdateDeliveryAddress: this.UpdateDeliveryAddress.bind(this),
+      DeleteDeliveryAddress: this.DeleteDeliveryAddress.bind(this)
     };
   }
 
@@ -1293,6 +1311,372 @@ class DatabaseService {
       
     } catch (error) {
       console.error('❌ DatabaseService.UpdateTailorItemPrice error:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Order Operations ====================
+
+  // Insert order using HBS template
+  async InsertOrder(parameters) {
+    try {
+      console.log('🔄 DatabaseService.InsertOrder called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('insertOrder');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Order inserted successfully');
+      
+      // Get the inserted order ID from the result
+      if (result && result.recordset && result.recordset.length > 0) {
+        const orderId = result.recordset[0].orderId;
+        console.log('✅ Order ID retrieved:', orderId);
+        return { success: true, orderId, result };
+      } else {
+        throw new Error('Failed to retrieve order ID after insertion');
+      }
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.InsertOrder error:', error);
+      throw error;
+    }
+  }
+
+  // Get order by ID using HBS template
+  async GetOrderById(orderId) {
+    try {
+      console.log('🔄 DatabaseService.GetOrderById called with orderId:', orderId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getOrderById');
+      const sql = template({ orderId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Order retrieved successfully');
+      
+      return (result && result.recordset && result.recordset.length > 0) ? result.recordset[0] : null;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetOrderById error:', error);
+      throw error;
+    }
+  }
+
+  // Get all orders using HBS template
+  async GetAllOrders(parameters = {}) {
+    try {
+      console.log('🔄 DatabaseService.GetAllOrders called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getAllOrders');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ All orders retrieved successfully');
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetAllOrders error:', error);
+      throw error;
+    }
+  }
+
+  // Get orders by customer ID using HBS template
+  async GetOrdersByCustomerId(customerId) {
+    try {
+      console.log('🔄 DatabaseService.GetOrdersByCustomerId called with customerId:', customerId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getOrdersByCustomerId');
+      const sql = template({ customerId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Orders retrieved successfully');
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetOrdersByCustomerId error:', error);
+      throw error;
+    }
+  }
+
+  // Update order using HBS template
+  async UpdateOrder(orderId, parameters) {
+    try {
+      console.log('🔄 DatabaseService.UpdateOrder called with orderId:', orderId, 'parameters:', parameters);
+      
+      // Add orderId to parameters
+      const updateData = { ...parameters, orderId };
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('updateOrder');
+      const sql = template(updateData);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Order updated successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.UpdateOrder error:', error);
+      throw error;
+    }
+  }
+
+  // Delete order using HBS template
+  async DeleteOrder(orderId) {
+    try {
+      console.log('🔄 DatabaseService.DeleteOrder called with orderId:', orderId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('deleteOrder');
+      const sql = template({ orderId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Order deleted successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.DeleteOrder error:', error);
+      throw error;
+    }
+  }
+
+  // ==================== OrderItem Operations ====================
+
+  // Insert order item using HBS template
+  async InsertOrderItem(parameters) {
+    try {
+      console.log('🔄 DatabaseService.InsertOrderItem called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('insertOrderItem');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Order item inserted successfully');
+      
+      // Get the inserted order item ID from the result
+      if (result && result.recordset && result.recordset.length > 0) {
+        const orderItemId = result.recordset[0].orderItemId;
+        console.log('✅ Order Item ID retrieved:', orderItemId);
+        return { success: true, orderItemId, result };
+      } else {
+        throw new Error('Failed to retrieve order item ID after insertion');
+      }
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.InsertOrderItem error:', error);
+      throw error;
+    }
+  }
+
+  // Get order items by order ID using HBS template
+  async GetOrderItemsByOrderId(orderId) {
+    try {
+      console.log('🔄 DatabaseService.GetOrderItemsByOrderId called with orderId:', orderId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getOrderItemsByOrderId');
+      const sql = template({ orderId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Order items retrieved successfully');
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetOrderItemsByOrderId error:', error);
+      throw error;
+    }
+  }
+
+  // Update order item using HBS template
+  async UpdateOrderItem(orderItemId, parameters) {
+    try {
+      console.log('🔄 DatabaseService.UpdateOrderItem called with orderItemId:', orderItemId, 'parameters:', parameters);
+      
+      // Add orderItemId to parameters
+      const updateData = { ...parameters, orderItemId };
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('updateOrderItem');
+      const sql = template(updateData);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Order item updated successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.UpdateOrderItem error:', error);
+      throw error;
+    }
+  }
+
+  // Delete order item using HBS template
+  async DeleteOrderItem(orderItemId) {
+    try {
+      console.log('🔄 DatabaseService.DeleteOrderItem called with orderItemId:', orderItemId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('deleteOrderItem');
+      const sql = template({ orderItemId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Order item deleted successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.DeleteOrderItem error:', error);
+      throw error;
+    }
+  }
+
+  // ==================== DeliveryAddress Operations ====================
+
+  // Insert delivery address using HBS template
+  async InsertDeliveryAddress(parameters) {
+    try {
+      console.log('🔄 DatabaseService.InsertDeliveryAddress called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('insertDeliveryAddress');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Delivery address inserted successfully');
+      
+      // Get the inserted delivery address ID from the result
+      if (result && result.recordset && result.recordset.length > 0) {
+        const deliveryAddressId = result.recordset[0].deliveryAddressId;
+        console.log('✅ Delivery Address ID retrieved:', deliveryAddressId);
+        return { success: true, deliveryAddressId, result };
+      } else {
+        throw new Error('Failed to retrieve delivery address ID after insertion');
+      }
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.InsertDeliveryAddress error:', error);
+      throw error;
+    }
+  }
+
+  // Get delivery address by order ID using HBS template
+  async GetDeliveryAddressByOrderId(orderId) {
+    try {
+      console.log('🔄 DatabaseService.GetDeliveryAddressByOrderId called with orderId:', orderId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getDeliveryAddressByOrderId');
+      const sql = template({ orderId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Delivery address retrieved successfully');
+      
+      return (result && result.recordset && result.recordset.length > 0) ? result.recordset[0] : null;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetDeliveryAddressByOrderId error:', error);
+      throw error;
+    }
+  }
+
+  // Get delivery addresses by user ID using HBS template
+  async GetDeliveryAddressesByUserId(userId) {
+    try {
+      console.log('🔄 DatabaseService.GetDeliveryAddressesByUserId called with userId:', userId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getDeliveryAddressesByUserId');
+      const sql = template({ userId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Delivery addresses retrieved successfully');
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetDeliveryAddressesByUserId error:', error);
+      throw error;
+    }
+  }
+
+  // Update delivery address using HBS template
+  async UpdateDeliveryAddress(deliveryAddressId, parameters) {
+    try {
+      console.log('🔄 DatabaseService.UpdateDeliveryAddress called with deliveryAddressId:', deliveryAddressId, 'parameters:', parameters);
+      
+      // Add deliveryAddressId to parameters
+      const updateData = { ...parameters, deliveryAddressId };
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('updateDeliveryAddress');
+      const sql = template(updateData);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Delivery address updated successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.UpdateDeliveryAddress error:', error);
+      throw error;
+    }
+  }
+
+  // Delete delivery address using HBS template
+  async DeleteDeliveryAddress(deliveryAddressId) {
+    try {
+      console.log('🔄 DatabaseService.DeleteDeliveryAddress called with deliveryAddressId:', deliveryAddressId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('deleteDeliveryAddress');
+      const sql = template({ deliveryAddressId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Delivery address deleted successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.DeleteDeliveryAddress error:', error);
       throw error;
     }
   }

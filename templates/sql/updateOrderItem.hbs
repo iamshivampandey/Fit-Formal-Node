@@ -1,0 +1,18 @@
+UPDATE OrderItems
+SET 
+  {{#if itemType}}itemType = '{{itemType}}',{{/if}}
+  {{#if productCode}}productCode = '{{productCode}}',{{/if}}
+  {{#if description}}description = '{{escapeSQL description}}',{{/if}}
+  {{#if shopId}}shopId = {{shopId}},{{/if}}
+  {{#if tailorId}}tailorId = {{tailorId}},{{/if}}
+  {{#if quantity}}quantity = {{quantity}},{{/if}}
+  {{#if unit}}unit = '{{unit}}',{{/if}}
+  {{#if unitPrice}}unitPrice = {{unitPrice}},{{/if}}
+  {{#if status}}status = '{{status}}',{{/if}}
+  {{#if notes}}notes = '{{escapeSQL notes}}',{{/if}}
+  {{#if measurementDate}}measurementDate = '{{measurementDate}}',{{/if}}
+  {{#if measurementSlot}}measurementSlot = '{{measurementSlot}}',{{/if}}
+  {{#if stitchingDate}}stitchingDate = '{{stitchingDate}}',{{/if}}
+  updatedAt = GETDATE()
+WHERE orderItemId = {{orderItemId}};
+

@@ -1,0 +1,16 @@
+SELECT 
+  o.orderId,
+  o.customerId,
+  o.orderDate,
+  o.orderType,
+  o.totalAmount,
+  o.paymentStatus,
+  o.advancePaid,
+  o.deliveryDate,
+  o.notes,
+  o.createdBy,
+  o.createdAt,
+  o.updatedAt
+FROM Orders o
+WHERE o.orderId = {{orderId}};
+

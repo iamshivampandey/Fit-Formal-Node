@@ -1,5 +1,4 @@
 INSERT INTO DeliveryAddresses (
-  orderId,
   userId,
   fullName,
   phoneNumber,
@@ -18,7 +17,6 @@ INSERT INTO DeliveryAddresses (
 )
 OUTPUT INSERTED.deliveryAddressId
 VALUES (
-  {{orderId}},
   {{#if userId}}{{userId}}{{else}}NULL{{/if}},
   '{{escapeSQL fullName}}',
   '{{escapeSQL phoneNumber}}',

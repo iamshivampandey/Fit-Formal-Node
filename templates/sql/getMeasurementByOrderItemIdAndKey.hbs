@@ -1,0 +1,11 @@
+SELECT 
+  measurementId,
+  orderItemId,
+  measurementKey,
+  measurementValue,
+  notes
+FROM Measurements
+WHERE orderItemId = {{orderItemId}}
+  AND measurementKey = '{{measurementKey}}';
+
+

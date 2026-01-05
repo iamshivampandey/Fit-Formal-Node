@@ -1,0 +1,36 @@
+SELECT 
+
+    CASE 
+
+        WHEN (
+
+            SELECT COUNT(*)
+
+            FROM OrderItems oi
+
+            WHERE oi.orderId = {{orderId}}
+
+        ) = (
+
+            SELECT COUNT(DISTINCT m.orderItemId)
+
+            FROM Measurements m
+
+            WHERE m.orderItemId IN (
+
+                SELECT oi2.orderItemId 
+
+                FROM OrderItems oi2 
+
+                WHERE oi2.orderId = {{orderId}}
+
+            )
+
+        )
+
+        THEN 1 
+
+        ELSE 0 
+
+    END AS allMeasurementsDone;
+

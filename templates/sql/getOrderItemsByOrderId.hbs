@@ -15,9 +15,20 @@ SELECT
   oi.measurementDate,
   oi.measurementSlot,
   oi.stitchingDate,
+  oi.isMeasurementDone,
   oi.createdAt,
-  oi.updatedAt
+  oi.updatedAt,
+  (
+      SELECT
+          m.measurementId,
+          m.measurementKey,
+          m.measurementValue,
+          m.notes
+      FROM Measurements m
+      WHERE m.orderItemId = oi.orderItemId
+      FOR JSON PATH
+  ) AS measurements
 FROM OrderItems oi
-WHERE oi.orderId = {{orderId}}
+WHERE oi.orderId = {{orderId}} 
 ORDER BY oi.createdAt ASC;
 

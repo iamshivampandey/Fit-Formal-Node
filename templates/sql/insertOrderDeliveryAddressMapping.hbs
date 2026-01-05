@@ -1,0 +1,14 @@
+INSERT INTO OrderDeliveryAddressMapping (
+  orderId,
+  deliveryAddressId,
+  deliveryAddressType,
+  createdAt
+)
+OUTPUT INSERTED.orderDeliveryId
+VALUES (
+  {{orderId}},
+  {{deliveryAddressId}},
+  {{#if deliveryAddressType}}'{{deliveryAddressType}}'{{else}}NULL{{/if}},
+  {{#if createdAt}}'{{createdAt}}'{{else}}GETDATE(){{/if}}
+);
+

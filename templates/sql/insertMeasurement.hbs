@@ -1,0 +1,15 @@
+INSERT INTO Measurements (
+  orderItemId,
+  measurementKey,
+  measurementValue,
+  notes
+)
+OUTPUT INSERTED.measurementId
+VALUES (
+  {{orderItemId}},
+  '{{escapeSQL measurementKey}}',
+  '{{escapeSQL measurementValue}}',
+  {{#if notes}}'{{escapeSQL notes}}'{{else}}NULL{{/if}}
+);
+
+

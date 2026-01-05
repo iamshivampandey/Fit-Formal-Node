@@ -1,5 +1,6 @@
 SELECT 
   da.deliveryAddressId,
+  da.orderId,
   da.userId,
   da.fullName,
   da.phoneNumber,
@@ -14,8 +15,11 @@ SELECT
   da.deliveryInstructions,
   da.googleMapLink,
   da.createdAt,
-  da.updatedAt
+  da.updatedAt,
+  odm.deliveryAddressType,
+  odm.orderDeliveryId
 FROM DeliveryAddresses da
-WHERE da.userId = {{userId}}
-ORDER BY da.createdAt DESC;
+INNER JOIN OrderDeliveryAddressMapping odm ON da.deliveryAddressId = odm.deliveryAddressId
+WHERE odm.orderId = {{orderId}}
+ORDER BY odm.createdAt ASC;
 

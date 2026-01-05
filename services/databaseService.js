@@ -69,17 +69,31 @@ class DatabaseService {
       GetOrdersByCustomerId: this.GetOrdersByCustomerId.bind(this),
       UpdateOrder: this.UpdateOrder.bind(this),
       DeleteOrder: this.DeleteOrder.bind(this),
+      GetOrdersPerDayByBusinessId: this.GetOrdersPerDayByBusinessId.bind(this),
+      GetOrdersByDateAndBusinessId: this.GetOrdersByDateAndBusinessId.bind(this),
+      GetOrdersByTailorId: this.GetOrdersByTailorId.bind(this),
+      GetOrdersByShopId: this.GetOrdersByShopId.bind(this),
+      GetOrdersByMeasurementBoyId: this.GetOrdersByMeasurementBoyId.bind(this),
       // OrderItem operations
       InsertOrderItem: this.InsertOrderItem.bind(this),
       GetOrderItemsByOrderId: this.GetOrderItemsByOrderId.bind(this),
       UpdateOrderItem: this.UpdateOrderItem.bind(this),
       DeleteOrderItem: this.DeleteOrderItem.bind(this),
+      CheckAllMeasurementsDone: this.CheckAllMeasurementsDone.bind(this),
+      UpdateOrderItemsMeasurementDone: this.UpdateOrderItemsMeasurementDone.bind(this),
       // DeliveryAddress operations
       InsertDeliveryAddress: this.InsertDeliveryAddress.bind(this),
       GetDeliveryAddressByOrderId: this.GetDeliveryAddressByOrderId.bind(this),
       GetDeliveryAddressesByUserId: this.GetDeliveryAddressesByUserId.bind(this),
       UpdateDeliveryAddress: this.UpdateDeliveryAddress.bind(this),
-      DeleteDeliveryAddress: this.DeleteDeliveryAddress.bind(this)
+      DeleteDeliveryAddress: this.DeleteDeliveryAddress.bind(this),
+      // OrderDeliveryAddressMapping operations
+      InsertOrderDeliveryAddressMapping: this.InsertOrderDeliveryAddressMapping.bind(this),
+      GetDeliveryAddressesByOrderId: this.GetDeliveryAddressesByOrderId.bind(this),
+      // Measurements operations
+      InsertMeasurement: this.InsertMeasurement.bind(this),
+      GetMeasurementByOrderItemIdAndKey: this.GetMeasurementByOrderItemIdAndKey.bind(this),
+      UpdateMeasurement: this.UpdateMeasurement.bind(this)
     };
   }
 
@@ -1459,6 +1473,128 @@ class DatabaseService {
     }
   }
 
+  // Get orders per day by business ID (tailorId) using HBS template
+  async GetOrdersPerDayByBusinessId(businessId, parameters = {}) {
+    try {
+      console.log('🔄 DatabaseService.GetOrdersPerDayByBusinessId called with businessId:', businessId, 'parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getOrdersPerDayByBusinessId');
+      const sql = template({ businessId, ...parameters });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Orders per day retrieved successfully');
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetOrdersPerDayByBusinessId error:', error);
+      throw error;
+    }
+  }
+
+  // Get orders by date and business ID (tailorId) using HBS template
+  async GetOrdersByDateAndBusinessId(businessId, date) {
+    try {
+      console.log('🔄 DatabaseService.GetOrdersByDateAndBusinessId called with businessId:', businessId, 'date:', date);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getOrdersByDateAndBusinessId');
+      const sql = template({ businessId, date });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Orders by date retrieved successfully');
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetOrdersByDateAndBusinessId error:', error);
+      throw error;
+    }
+  }
+
+  // Get orders by tailor ID using HBS template
+  async GetOrdersByTailorId(tailorId, parameters = {}) {
+    try {
+      console.log('🔄 DatabaseService.GetOrdersByTailorId called with tailorId:', tailorId, 'parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getOrdersByTailorId');
+      const sql = template({ tailorId, ...parameters });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Orders by tailor ID retrieved successfully');
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetOrdersByTailorId error:', error);
+      throw error;
+    }
+  }
+
+  // Get orders by shop ID using HBS template
+  async GetOrdersByShopId(shopId, parameters = {}) {
+    try {
+      console.log('🔄 DatabaseService.GetOrdersByShopId called with shopId:', shopId, 'parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getOrdersByShopId');
+      const sql = template({ shopId, ...parameters });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Orders by shop ID retrieved successfully');
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetOrdersByShopId error:', error);
+      throw error;
+    }
+  }
+
+  // Get orders by measurement boy ID using HBS template
+  async GetOrdersByMeasurementBoyId(measurementBoyId, isOrderMeasurementDone = null) {
+    try {
+      console.log('🔄 DatabaseService.GetOrdersByMeasurementBoyId called with measurementBoyId:', measurementBoyId, 'isOrderMeasurementDone:', isOrderMeasurementDone);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getOrdersByMeasurementBoyId');
+      const templateData = { 
+        measurementBoyId
+      };
+      
+      // Only add filter if provided
+      if (isOrderMeasurementDone !== null && isOrderMeasurementDone !== undefined) {
+        templateData.isOrderMeasurementDone = isOrderMeasurementDone;
+        templateData.hasFilter = true;
+      } else {
+        templateData.hasFilter = false;
+      }
+      
+      const sql = template(templateData);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Orders by measurement boy ID retrieved successfully');
+      
+      return (result && result.recordset) ? result.recordset : [];
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetOrdersByMeasurementBoyId error:', error);
+      throw error;
+    }
+  }
+
   // ==================== OrderItem Operations ====================
 
   // Insert order item using HBS template
@@ -1559,6 +1695,55 @@ class DatabaseService {
     }
   }
 
+  // Check if all measurements are done for an order
+  async CheckAllMeasurementsDone(orderId) {
+    try {
+      console.log('🔄 DatabaseService.CheckAllMeasurementsDone called with orderId:', orderId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('checkAllMeasurementsDone');
+      const sql = template({ orderId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Check all measurements done query executed successfully');
+      
+      if (result && result.recordset && result.recordset.length > 0) {
+        const allMeasurementsDone = result.recordset[0].allMeasurementsDone;
+        return allMeasurementsDone === 1 || allMeasurementsDone === true;
+      }
+      
+      return false;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.CheckAllMeasurementsDone error:', error);
+      throw error;
+    }
+  }
+
+  // Update all order items' isMeasurementDone to 1 for an order
+  async UpdateOrderItemsMeasurementDone(orderId) {
+    try {
+      console.log('🔄 DatabaseService.UpdateOrderItemsMeasurementDone called with orderId:', orderId);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('updateOrderItemsMeasurementDone');
+      const sql = template({ orderId });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Order items measurement done updated successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.UpdateOrderItemsMeasurementDone error:', error);
+      throw error;
+    }
+  }
+
   // ==================== DeliveryAddress Operations ====================
 
   // Insert delivery address using HBS template
@@ -1590,7 +1775,7 @@ class DatabaseService {
     }
   }
 
-  // Get delivery address by order ID using HBS template
+  // Get delivery address(es) by order ID using HBS template (returns array)
   async GetDeliveryAddressByOrderId(orderId) {
     try {
       console.log('🔄 DatabaseService.GetDeliveryAddressByOrderId called with orderId:', orderId);
@@ -1602,14 +1787,20 @@ class DatabaseService {
       
       // Execute the SQL query
       const result = await executeQuery(sql);
-      console.log('✅ Delivery address retrieved successfully');
+      console.log('✅ Delivery address(es) retrieved successfully');
       
-      return (result && result.recordset && result.recordset.length > 0) ? result.recordset[0] : null;
+      // Return array of addresses (can be empty array)
+      return (result && result.recordset) ? result.recordset : [];
       
     } catch (error) {
       console.error('❌ DatabaseService.GetDeliveryAddressByOrderId error:', error);
       throw error;
     }
+  }
+
+  // Get delivery addresses by order ID (alias for consistency)
+  async GetDeliveryAddressesByOrderId(orderId) {
+    return this.GetDeliveryAddressByOrderId(orderId);
   }
 
   // Get delivery addresses by user ID using HBS template
@@ -1677,6 +1868,115 @@ class DatabaseService {
       
     } catch (error) {
       console.error('❌ DatabaseService.DeleteDeliveryAddress error:', error);
+      throw error;
+    }
+  }
+
+  // ==================== OrderDeliveryAddressMapping Operations ====================
+
+  // Insert order delivery address mapping using HBS template
+  async InsertOrderDeliveryAddressMapping(parameters) {
+    try {
+      console.log('🔄 DatabaseService.InsertOrderDeliveryAddressMapping called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('insertOrderDeliveryAddressMapping');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Order delivery address mapping inserted successfully');
+      
+      // Get the inserted mapping ID from the result
+      if (result && result.recordset && result.recordset.length > 0) {
+        const orderDeliveryId = result.recordset[0].orderDeliveryId;
+        console.log('✅ Order Delivery Address Mapping ID retrieved:', orderDeliveryId);
+        return { success: true, orderDeliveryId, result };
+      } else {
+        throw new Error('Failed to retrieve order delivery address mapping ID after insertion');
+      }
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.InsertOrderDeliveryAddressMapping error:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Measurements Operations ====================
+
+  // Insert measurement using HBS template
+  async InsertMeasurement(parameters) {
+    try {
+      console.log('🔄 DatabaseService.InsertMeasurement called with parameters:', parameters);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('insertMeasurement');
+      const sql = template(parameters);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Measurement inserted successfully');
+      
+      // Get the inserted measurement ID from the result
+      if (result && result.recordset && result.recordset.length > 0) {
+        const measurementId = result.recordset[0].measurementId;
+        console.log('✅ Measurement ID retrieved:', measurementId);
+        return { success: true, measurementId, result };
+      } else {
+        throw new Error('Failed to retrieve measurement ID after insertion');
+      }
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.InsertMeasurement error:', error);
+      throw error;
+    }
+  }
+
+  // Get measurement by orderItemId and measurementKey using HBS template
+  async GetMeasurementByOrderItemIdAndKey(orderItemId, measurementKey) {
+    try {
+      console.log('🔄 DatabaseService.GetMeasurementByOrderItemIdAndKey called with orderItemId:', orderItemId, 'measurementKey:', measurementKey);
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('getMeasurementByOrderItemIdAndKey');
+      const sql = template({ orderItemId, measurementKey });
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Measurement retrieved successfully');
+      
+      return (result && result.recordset && result.recordset.length > 0) ? result.recordset[0] : null;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.GetMeasurementByOrderItemIdAndKey error:', error);
+      throw error;
+    }
+  }
+
+  // Update measurement using HBS template
+  async UpdateMeasurement(measurementId, parameters) {
+    try {
+      console.log('🔄 DatabaseService.UpdateMeasurement called with measurementId:', measurementId, 'parameters:', parameters);
+      
+      // Add measurementId to parameters
+      const updateData = { ...parameters, measurementId };
+      
+      // Generate SQL using HBS template
+      const template = loadTemplate('updateMeasurement');
+      const sql = template(updateData);
+      console.log('📋 Generated SQL:', sql);
+      
+      // Execute the SQL query
+      const result = await executeQuery(sql);
+      console.log('✅ Measurement updated successfully');
+      
+      return result;
+      
+    } catch (error) {
+      console.error('❌ DatabaseService.UpdateMeasurement error:', error);
       throw error;
     }
   }

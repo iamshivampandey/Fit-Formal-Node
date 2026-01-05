@@ -1,0 +1,6 @@
+UPDATE Measurements
+SET 
+  measurementValue = '{{escapeSQL measurementValue}}'{{#if notes}},
+  notes = '{{escapeSQL notes}}'{{/if}}
+WHERE measurementId = {{measurementId}};
+

@@ -135,14 +135,32 @@ const validationRules = {
     .optional()
     .trim()
     .customSanitizer(value => {
-      // Capitalize first letter to match database format
+      // Capitalize first letter and preserve camelCase for multi-word roles
       if (value) {
-        return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+        // Handle camelCase roles like "MeasurementBoy" or "Taylorseller"
+        const lowerValue = value.toLowerCase();
+        const validRoles = {
+          'admin': 'Admin',
+          'customer': 'Customer',
+          'seller': 'Seller',
+          'tailor': 'Tailor',
+          'taylorseller': 'Taylorseller',
+          'measurementboy': 'MeasurementBoy',
+          'measurement boy': 'MeasurementBoy'
+        };
+        
+        // Check if it matches any valid role (case-insensitive)
+        if (validRoles[lowerValue]) {
+          return validRoles[lowerValue];
+        }
+        
+        // Fallback: capitalize first letter only
+        return value.charAt(0).toUpperCase() + value.slice(1);
       }
       return value;
     })
-    .isIn(['Admin', 'Customer', 'Seller', 'Tailor', 'Taylorseller'])
-    .withMessage('Role name must be one of: Admin, Customer, Seller, Tailor, Taylorseller'),
+    .isIn(['Admin', 'Customer', 'Seller', 'Tailor', 'Taylorseller', 'MeasurementBoy'])
+    .withMessage('Role name must be one of: Admin, Customer, Seller, Tailor, Taylorseller, MeasurementBoy'),
 
   // Business Information validations (optional, for Seller/Tailor/Taylorseller roles)
   // Accept businessInfo as a nested object

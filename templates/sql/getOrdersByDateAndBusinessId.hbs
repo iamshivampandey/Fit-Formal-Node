@@ -1,0 +1,19 @@
+SELECT DISTINCT
+  o.orderId,
+  o.customerId,
+  o.orderDate,
+  o.orderType,
+  o.totalAmount,
+  o.paymentStatus,
+  o.advancePaid,
+  o.deliveryDate,
+  o.notes,
+  o.createdBy,
+  o.createdAt,
+  o.updatedAt
+FROM Orders o
+INNER JOIN OrderItems oi ON o.orderId = oi.orderId
+WHERE oi.tailorId = {{businessId}}
+  AND CAST(oi.stitchingDate AS DATE) = CAST('{{date}}' AS DATE)
+ORDER BY o.createdAt DESC;
+

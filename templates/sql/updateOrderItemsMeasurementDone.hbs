@@ -1,0 +1,6 @@
+UPDATE OrderItems
+SET 
+    isMeasurementDone = 1,
+    updatedAt = GETDATE()
+WHERE orderId = {{orderId}};
+

@@ -28,6 +28,11 @@ Handlebars.registerHelper('isDefined', function(value) {
   return value !== undefined;
 });
 
+// Helper to check if a value is not null and not undefined
+Handlebars.registerHelper('isNotNull', function(value) {
+  return value !== null && value !== undefined;
+});
+
 // Helper for equality check
 Handlebars.registerHelper('eq', function(a, b) {
   return a === b;

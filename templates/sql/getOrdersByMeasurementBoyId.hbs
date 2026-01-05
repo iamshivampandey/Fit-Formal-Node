@@ -1,0 +1,87 @@
+SELECT 
+    --- ORDER DETAILS
+    o.orderId,
+    o.customerId,
+    o.orderDate,
+    o.orderType,
+    o.totalAmount,
+    o.paymentStatus,
+    o.advancePaid,
+    o.deliveryDate,
+    o.notes,
+    o.createdBy,
+    o.createdAt,
+    o.updatedAt,
+
+    ---- ASSIGNMENT DETAILS
+    omba.orderMeasurementBoyAssignmentId,
+    omba.userId AS measurementBoyId,
+    omba.status AS assignmentStatus,
+    omba.assignedAt,
+    omba.startedAt,
+    omba.completedAt,
+
+    ---- ORDER MEASUREMENT DONE? (FROM APPLY)
+    md.isOrderMeasurementDone,
+
+    ----- DELIVERY ADDRESS JSON
+    (
+        SELECT 
+            da.deliveryAddressId, da.userId, da.fullName, da.phoneNumber,
+            da.alternatePhone, da.addressLine1, da.addressLine2, da.landmark,
+            da.city, da.state, da.pincode, da.addressType,
+            da.deliveryInstructions, da.googleMapLink,
+            odm.deliveryAddressType, odm.orderDeliveryId
+        FROM DeliveryAddresses da
+        INNER JOIN OrderDeliveryAddressMapping odm 
+            ON da.deliveryAddressId = odm.deliveryAddressId
+        WHERE odm.orderId = o.orderId
+          AND odm.deliveryAddressType = 'Measurement'
+        FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
+    ) AS measurementAddress,
+
+    ----- ORDER ITEMS JSON
+    (
+        SELECT
+            oi.orderItemId, oi.orderId, oi.itemType, oi.productCode,
+            oi.description, oi.shopId, oi.tailorId, oi.quantity,
+            oi.unit, oi.unitPrice, oi.itemTotal, oi.status, oi.notes,
+            oi.measurementDate, oi.measurementSlot, oi.stitchingDate,
+            oi.isMeasurementDone, oi.createdAt, oi.updatedAt,
+
+            (
+                SELECT
+                    m.measurementId, m.measurementKey,
+                    m.measurementValue, m.notes
+                FROM Measurements m
+                WHERE m.orderItemId = oi.orderItemId
+                FOR JSON PATH
+            ) AS measurements
+
+        FROM OrderItems oi
+        WHERE oi.orderId = o.orderId
+        ORDER BY oi.createdAt ASC
+        FOR JSON PATH
+    ) AS orderItems
+
+FROM Orders o
+INNER JOIN OrderMeasurementBoyAssignment omba 
+    ON o.orderId = omba.orderId
+
+-- CROSS APPLY calculates isOrderMeasurementDone
+CROSS APPLY (
+    SELECT 
+        CASE 
+            WHEN NOT EXISTS (
+                SELECT 1 
+                FROM OrderItems oi2
+                WHERE oi2.orderId = o.orderId 
+                  AND oi2.isMeasurementDone = 0
+            )
+        THEN 1 ELSE 0 END AS isOrderMeasurementDone
+) md
+
+WHERE omba.userId = {{measurementBoyId}}{{#if hasFilter}}
+    AND md.isOrderMeasurementDone = {{isOrderMeasurementDone}}{{/if}}
+
+ORDER BY omba.assignedAt DESC;
